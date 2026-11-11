@@ -996,6 +996,8 @@
                 <button type="button" onclick="addRebarRow('strap')" class="px-2.5 py-1.5 text-xs bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-lg border border-transparent dark:border-blue-700/50">+ Strap beam</button>
                 <button type="button" onclick="addRebarRow('shear')" class="px-2.5 py-1.5 text-xs bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-lg border border-transparent dark:border-blue-700/50">+ Shear wall / lift</button>
                 <button type="button" onclick="recalcRebarSchedule()" class="px-2.5 py-1.5 text-xs bg-emerald-600 text-white rounded-lg">Calculate rebar → takeoff</button>
+                <button type="button" onclick="removeLastSlabHelperBatch()" class="px-2.5 py-1.5 text-xs bg-amber-50 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 rounded-lg border border-amber-200 dark:border-amber-700">Undo last slab helper</button>
+                <button type="button" onclick="clearRebarSchedule()" class="px-2.5 py-1.5 text-xs bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-lg border border-red-200 dark:border-red-800">Clear schedule</button>
               </div>
 
               <!-- Easy slab rebar helper -->
@@ -1064,6 +1066,7 @@
                   <button type="button" onclick="previewSlabRebarHelper()" class="px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 rounded-lg">Preview bars</button>
                   <button type="button" onclick="applySlabRebarHelper()" class="px-2.5 py-1.5 text-xs bg-emerald-600 text-white rounded-lg font-medium">Add slab bars to schedule</button>
                 </div>
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-2">Mistaken add? Use <strong>✕</strong> on each row, <strong>Undo last slab helper</strong>, or <strong>Clear schedule</strong>. Edit numbers in the table anytime.</p>
               </div>
 
               <p class="text-[11px] text-gray-500 mt-2">Total scheduled rebar: <strong id="rebarScheduleTotal">0</strong> kg (<span id="rebarScheduleTonne">0</span> t) — includes <strong>main bars + stirrups/links</strong> (from Ø, spacing and member size). Ethiopian practice: often S-300 for ≤Ø12, S-400 for &gt;Ø12; S-500 for high-strength — adjust grade per row. Columns, beams, strap beams, pads and combined footings use closed stirrups; piles use spiral/rings.</p>
@@ -2867,6 +2870,8 @@
       if (!s) { showToast('Enter slab short & long sides'); return; }
       // Map to schedule rows compatible with estimateRowKg
       // For slabs, existing model uses type slab, len as area m2 OR length — check estimateRowKg
+      const batchId = newRebarId();
+      window._lastSlabBatch = batchId;
       s.rows.forEach(r => {
         const nBars = Math.max(1, r.mainBars || 1);
         const oneLen = (r.len || 0) / nBars; // r.len was total metres for one panel strip
@@ -2874,9 +2879,10 @@
         // For -ve rows, r.nos already includes edge multiplier * panels
         const totalBars = Math.max(1, Math.round((r.label && r.label.indexOf('−ve') >= 0) ? (r.nos * nBars) : (panels * nBars)));
         const row = {
-          id: Date.now() + Math.random(),
+          id: newRebarId(),
           type: 'slab_line',
           label: r.label,
+          _slabBatch: batchId,
           nos: totalBars,
           size: r.size,
           len: Math.round(oneLen * 1000) / 1000,
@@ -2910,7 +2916,7 @@
         slab_neg: { type:'slab', label:'Slab -ve bars', nos:1, size:'150 thk', len:20, mainBars:0, mainDia:12, grade:'S-400', distDia:8, spacing:150 },
         slab_dist: { type:'slab', label:'Slab distribution', nos:1, size:'150 thk', len:20, mainBars:0, mainDia:8, grade:'S-300', distDia:8, spacing:200 }
       };
-      const row = Object.assign({ id: Date.now()+Math.random() }, defaults[type] || defaults.column);
+      const row = Object.assign({ id: newRebarId() }, defaults[type] || defaults.column);
       // Prefer member-type default grade (foundation / column / beam / slab), else global auto
       const foundTypes = ['pad','raft','pile','combined'];
       const beamTypes = ['beam','strap'];
@@ -2928,9 +2934,44 @@
       rebarSchedule.push(row);
       renderRebarSchedule();
     }
+    function newRebarId() {
+      // Integer string IDs — avoid float equality bugs in remove/edit
+      return String(Date.now()) + '-' + String(Math.floor(Math.random() * 1e9));
+    }
     function removeRebarRow(id) {
-      rebarSchedule = rebarSchedule.filter(r => r.id !== id);
+      const sid = String(id);
+      const before = rebarSchedule.length;
+      rebarSchedule = rebarSchedule.filter(r => String(r.id) !== sid);
+      if (rebarSchedule.length === before) {
+        // fallback: sometimes id was passed as number
+        rebarSchedule = rebarSchedule.filter(r => String(r.id) !== String(Number(id)));
+      }
       renderRebarSchedule();
+      if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
+      if (typeof showToast === 'function') showToast('Row removed');
+    }
+    function clearRebarSchedule() {
+      if (!rebarSchedule.length) { showToast('Schedule already empty'); return; }
+      if (!confirm('Remove ALL reinforcement schedule rows?')) return;
+      rebarSchedule = [];
+      renderRebarSchedule();
+      if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
+      showToast('Schedule cleared');
+    }
+    function removeLastSlabHelperBatch() {
+      // Remove rows added by the last slab helper run (tagged _slabBatch)
+      if (!window._lastSlabBatch) {
+        showToast('No slab-helper batch to undo');
+        return;
+      }
+      const bid = window._lastSlabBatch;
+      const n0 = rebarSchedule.length;
+      rebarSchedule = rebarSchedule.filter(r => r._slabBatch !== bid);
+      const n = n0 - rebarSchedule.length;
+      renderRebarSchedule();
+      if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
+      window._lastSlabBatch = null;
+      showToast(n ? ('Removed ' + n + ' slab helper row(s)') : 'Nothing to undo');
     }
     function parseMemberSizeMm(size) {
       // Parse "300x300", "200x400", "1500x1500x400", "Ø400" → {w,h,d} in mm
@@ -3009,7 +3050,7 @@
       tbody.innerHTML = rebarSchedule.map(r => {
         const kg = estimateRowKg(r);
         return `<tr class="border-b border-slate-100 dark:border-gray-800">
-          <td class="px-1 py-1"><span class="font-medium text-slate-800 dark:text-slate-100">${r.label||r.type}</span> <button type="button" onclick="removeRebarRow(${r.id})" class="text-red-400 ml-1">✕</button></td>
+          <td class="px-1 py-1"><span class="font-medium text-slate-800 dark:text-slate-100">${r.label||r.type}</span> <button type="button" onclick="removeRebarRow('${r.id}')" class="text-red-500 dark:text-red-400 ml-1 font-bold" title="Remove this row">✕</button></td>
           <td class="px-1 py-1"><input type="number" data-rid="${r.id}" data-f="nos" value="${r.nos}" class="w-14 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs text-right"></td>
           <td class="px-1 py-1"><input type="text" data-rid="${r.id}" data-f="size" value="${r.size||''}" class="w-24 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs"></td>
           <td class="px-1 py-1"><input type="number" step="0.1" data-rid="${r.id}" data-f="len" value="${r.len}" class="w-16 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs text-right" title="${r.type==='slab'||r.type==='raft'?'Area m² for slab/raft':'Length m'}"></td>
@@ -3034,9 +3075,9 @@
     }
     function onRebarField(e) {
       // Update model only — do NOT rebuild the table on every keystroke (keeps focus while typing size/numbers)
-      const id = parseFloat(e.target.getAttribute('data-rid'));
+      const id = String(e.target.getAttribute('data-rid') || '');
       const f = e.target.getAttribute('data-f');
-      const row = rebarSchedule.find(r => r.id === id);
+      const row = rebarSchedule.find(r => String(r.id) === id);
       if (!row) return;
       let v = e.target.value;
       if (['nos','len','mainBars','mainDia','distDia','spacing'].includes(f)) {
@@ -5000,7 +5041,7 @@
           boqItems = boqItems.filter(it => !(it.section === 'Superstructure' && /slab/i.test(it.desc||'') && !/post-tens|PT /i.test(it.desc||'')));
           const base = BASE_RATES.slabs_pt || BASE_RATES.slabs;
           const r = Math.round((base.rate || 42000) * mult);
-          boqItems.push({id:Date.now()+Math.random(), desc: withBldg((base.desc||'Post-tensioned slab concrete') + ' grade ' + (memberGradeLabel.slabs||'')), unit:'m³', qty:conv, rate:r, section:'Superstructure', amount:Math.round(conv*r)});
+          boqItems.push({id: newRebarId(), desc: withBldg((base.desc||'Post-tensioned slab concrete') + ' grade ' + (memberGradeLabel.slabs||'')), unit:'m³', qty:conv, rate:r, section:'Superstructure', amount:Math.round(conv*r)});
           // Auto tendon ~18 kg/m³ slab, anchors rough, grout from span estimate
           const tendonKg = Math.round(conv * 18);
           const anchors = Math.max(4, Math.round(conv / 3));
@@ -5009,7 +5050,7 @@
             const br = BASE_RATES[k];
             if (!br || q <= 0) return;
             const rate = Math.round(br.rate * mult);
-            boqItems.push({id:Date.now()+Math.random(), desc:withBldg(br.desc), unit:br.unit, qty:q, rate, section:'Superstructure', amount:Math.round(q*rate)});
+            boqItems.push({id: newRebarId(), desc:withBldg(br.desc), unit:br.unit, qty:q, rate, section:'Superstructure', amount:Math.round(q*rate)});
           });
         }
       }
@@ -5205,7 +5246,7 @@
           const act = projectBuildings.find(b => b.active) || projectBuildings[0];
           if (act && act.name && !desc.startsWith('[')) desc = '[' + act.name + '] ' + desc;
         }
-        boqItems.push({id:Date.now()+Math.random(), desc, unit:b.unit, qty:Math.round(adj*100)/100, rate, section:b.section, amount:Math.round(adj*rate)});
+        boqItems.push({id: newRebarId(), desc, unit:b.unit, qty:Math.round(adj*100)/100, rate, section:b.section, amount:Math.round(adj*rate)});
       });
       // ----- Other buildings in project (merge takeoff quantities) -----
       if (typeof projectBuildings !== 'undefined' && projectBuildings.length > 1) {
@@ -5219,7 +5260,7 @@
             const base = BASE_RATES[key];
             const rate = Math.round(base.rate * mult * soilMultForKey(key) * windMultForKey(key) * (['found_concrete','columns','beams','slabs'].includes(key) ? concMult : 1));
             boqItems.push({
-              id: Date.now() + Math.random(),
+              id: newRebarId(),
               desc: prefix + base.desc,
               unit: base.unit,
               qty: Math.round(qty * 100) / 100,
@@ -5251,21 +5292,21 @@
       if (st && flights > 0) {
         const sMult = memberGradeMult.stair_rc || 1;
         const rate = Math.round(st.rate * mult * sMult);
-        boqItems.push({id:Date.now()+Math.random(), desc: withBldg(st.desc + ' (' + stairType.replace(/_/g,' ') + ') grade ' + (memberGradeLabel.stair_rc||'')) , unit:st.unit, qty:flights, rate, section:'Stairs', amount:Math.round(flights*rate)});
+        boqItems.push({id: newRebarId(), desc: withBldg(st.desc + ' (' + stairType.replace(/_/g,' ') + ') grade ' + (memberGradeLabel.stair_rc||'')) , unit:st.unit, qty:flights, rate, section:'Stairs', amount:Math.round(flights*rate)});
       }
       const finishKey = stairFinish === 'marble' ? 'stair_finish_marble' : (stairFinish === 'terrazzo' ? 'stair_finish_terrazzo' : 'stair_finish_ceramic');
       const sf = BASE_RATES[finishKey];
       if (sf) {
         const qty = Math.round(flights * stairAreaPerFlight * 10) / 10;
         const rate = Math.round(sf.rate * mult);
-        boqItems.push({id:Date.now()+Math.random(), desc:sf.desc, unit:sf.unit, qty, rate, section:'Stairs', amount:Math.round(qty*rate)});
+        boqItems.push({id: newRebarId(), desc:sf.desc, unit:sf.unit, qty, rate, section:'Stairs', amount:Math.round(qty*rate)});
       }
       const hrKey = handrailType === 'glass' ? 'handrail_glass' : (handrailType === 'timber' ? 'handrail_timber' : (handrailType === 'steel_simple' ? 'handrail_steel' : 'handrail_ss'));
       const hr = BASE_RATES[hrKey];
       if (hr && handrailLen > 0) {
         const rate = Math.round(hr.rate * mult);
         const qty = Math.round(handrailLen * 10) / 10;
-        boqItems.push({id:Date.now()+Math.random(), desc:hr.desc, unit:hr.unit, qty, rate, section:'Stairs', amount:Math.round(qty*rate)});
+        boqItems.push({id: newRebarId(), desc:hr.desc, unit:hr.unit, qty, rate, section:'Stairs', amount:Math.round(qty*rate)});
       }
 
       // ----- Finish upgrades from material selectors -----
@@ -5310,7 +5351,7 @@
         const r = Math.round((base?.rate || 4200) * mult);
         const desc = (base?.desc || 'Floor finish') + ' (' + z.label + ')';
         boqItems.push({
-          id: Date.now() + Math.random(),
+          id: newRebarId(),
           desc: desc,
           unit: 'm²',
           qty: area,
@@ -5336,18 +5377,18 @@
       if (ww && wetArea > 0) {
         const qty = Math.round(wetArea * 2.4); // walls ~2.4x floor in wet rooms
         const rate = Math.round(ww.rate * mult);
-        boqItems.push({id:Date.now()+Math.random(), desc:ww.desc, unit:'m²', qty, rate, section:'Finishes', amount:Math.round(qty*rate)});
+        boqItems.push({id: newRebarId(), desc:ww.desc, unit:'m²', qty, rate, section:'Finishes', amount:Math.round(qty*rate)});
       }
       // External finish upgrade
       const extFin = document.getElementById('to_ext_finish')?.value || 'paint';
       if (extFin === 'stone') {
         const r = Math.round(BASE_RATES.ext_stone.rate * mult);
         const qty = Math.round(Math.sqrt(gfa) * 4 * floorH * 0.6);
-        boqItems.push({id:Date.now()+Math.random(), desc:BASE_RATES.ext_stone.desc, unit:'m²', qty, rate:r, section:'Finishes', amount:Math.round(qty*r)});
+        boqItems.push({id: newRebarId(), desc:BASE_RATES.ext_stone.desc, unit:'m²', qty, rate:r, section:'Finishes', amount:Math.round(qty*r)});
       } else if (extFin === 'aluminium') {
         const r = Math.round(BASE_RATES.ext_acp.rate * mult);
         const qty = Math.round(Math.sqrt(gfa) * 4 * floorH * 0.5);
-        boqItems.push({id:Date.now()+Math.random(), desc:BASE_RATES.ext_acp.desc, unit:'m²', qty, rate:r, section:'Finishes', amount:Math.round(qty*r)});
+        boqItems.push({id: newRebarId(), desc:BASE_RATES.ext_acp.desc, unit:'m²', qty, rate:r, section:'Finishes', amount:Math.round(qty*r)});
       }
 
       // Slab thickness adjustment (thicker slab → more concrete already partly in to_slabs; add note via rate tweak on slabs if needed)
@@ -5385,7 +5426,7 @@
             if (t <= 0) return;
             const r = Math.round((baseRebar.rate || 185000) * mult * (gradeMult[g] || 1));
             boqItems.push({
-              id: Date.now() + Math.random(),
+              id: newRebarId(),
               desc: withBldg((baseRebar.desc || 'High-yield reinforcement bars') + ' grade ' + g + ' including cutting, bending and fixing'),
               unit: 'tonne',
               qty: t,
