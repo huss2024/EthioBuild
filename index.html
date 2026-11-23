@@ -6308,6 +6308,7 @@
       }
     }
 
+    
     function exportProfessionalExcel() {
       const name = (document.getElementById('projName')?.value || '').trim() || 'Estimate';
       if (typeof requireUnlock === 'function' && !requireUnlock(name, 'export')) return;
@@ -6335,35 +6336,44 @@
         let s = String(d || '').replace(/\[[^\]]+\]\s*/g, '');
         s = s.replace(/MoM:\s*[^.;]+[.;]?\s*/gi, '');
         s = s.replace(/\s{2,}/g, ' ').trim();
-        if (s.length > 160) s = s.slice(0, 157).trim() + '...';
+        // Keep readable length but allow wrap in cell (no hard cut mid-sentence if short)
+        if (s.length > 220) s = s.slice(0, 217).trim() + '...';
         return s;
       };
+      const safeSheet = (s) => {
+        let t = String(s || 'Sheet').replace(/[:\\\/\?\*\[\]]/g, ' ').replace(/\s+/g, ' ').trim();
+        if (t.length > 28) t = t.slice(0, 28).trim();
+        return t || 'Sheet';
+      };
+      const bldgOf = (it) => {
+        const m = /^\[([^\]]+)\]/.exec(it.desc || '');
+        return m ? m[1].trim() : ((typeof projectBuildings !== 'undefined' && projectBuildings[0]) ? projectBuildings[0].name : 'Main building');
+      };
 
-      // Professional cell helpers (no formulas — max Excel compatibility)
       const cellS = (v, style) =>
         '<Cell' + (style ? (' ss:StyleID="' + style + '"') : '') + '><Data ss:Type="String">' + esc(v) + '</Data></Cell>';
       const cellN = (v, style) =>
         '<Cell' + (style ? (' ss:StyleID="' + style + '"') : '') + '><Data ss:Type="Number">' + num(v) + '</Data></Cell>';
       const cellEmpty = (style) => '<Cell' + (style ? (' ss:StyleID="' + style + '"') : '') + '/>';
-      const row = (cells) => '<Row>' + cells + '</Row>\r\n';
+      const row = (cells, height) =>
+        '<Row' + (height ? (' ss:Height="' + height + '" ss:AutoFitHeight="0"') : '') + '>' + cells + '</Row>\r\n';
       const cols = (widths) => widths.map(w => '<Column ss:AutoFitWidth="0" ss:Width="' + w + '"/>').join('');
       const sheet = (sheetName, colXml, body) =>
-        '<Worksheet ss:Name="' + esc(sheetName) + '">\r\n' +
-        '<Table ss:DefaultRowHeight="15">\r\n' +
+        '<Worksheet ss:Name="' + esc(safeSheet(sheetName)) + '">\r\n' +
+        '<Table ss:DefaultRowHeight="18">\r\n' +
         colXml + '\r\n' + body +
         '</Table>\r\n' +
         '</Worksheet>\r\n';
 
-      const subtotal = (typeof boqItems !== 'undefined' && boqItems.length)
-        ? boqItems.reduce((s, it) => s + (Number(it.amount) || 0), 0) : 0;
+      const items = (typeof boqItems !== 'undefined' && boqItems.length) ? boqItems.slice() : [];
+      const subtotalAll = items.reduce((s, it) => s + (Number(it.amount) || 0), 0);
       const contPct = parseFloat(document.getElementById('markupContingency')?.value) || 0;
       const opPct = parseFloat(document.getElementById('markupOP')?.value) || 0;
       const vatPct = parseFloat(document.getElementById('markupVAT')?.value) || 0;
-      const afterC = subtotal * (1 + contPct / 100);
+      const afterC = subtotalAll * (1 + contPct / 100);
       const afterO = afterC * (1 + opPct / 100);
       const grand = afterO * (1 + vatPct / 100);
 
-      // Ethiopian bill order
       const orderKeys = ['Preliminaries','Substructure Earthwork','Substructure Concrete','Substructure Masonry','Substructure','Superstructure','Steel Structure','Stairs','Roof','Openings','Finishes','Plumbing','Electrical','HVAC','Lifts','Fire Protection','Hospital Systems','Industrial Systems','Special Systems','External','Site Works','Landscape','Custom'];
       const billTitle = (sec) => {
         const map = {
@@ -6389,14 +6399,156 @@
         };
         return map[sec] || String(sec || 'OTHER WORKS').toUpperCase();
       };
-      const sortedItems = (boqItems || []).slice().sort((a, b) => {
+      const sortItems = (arr) => arr.slice().sort((a, b) => {
         const ia = orderKeys.indexOf(a.section); const ib = orderKeys.indexOf(b.section);
         const oa = ia < 0 ? 99 : ia; const ob = ib < 0 ? 99 : ib;
         if (oa !== ob) return oa - ob;
         return 0;
       });
 
-      // ========== 1. COVER ==========
+      // Group BOQ by building
+      const byBuilding = {};
+      items.forEach(it => {
+        const bn = bldgOf(it);
+        if (!byBuilding[bn]) byBuilding[bn] = [];
+        byBuilding[bn].push(it);
+      });
+      let buildingNames = Object.keys(byBuilding);
+      if (!buildingNames.length) {
+        buildingNames = (typeof projectBuildings !== 'undefined' && projectBuildings.length)
+          ? projectBuildings.map(b => b.name || 'Building')
+          : ['Main building'];
+        buildingNames.forEach(n => { if (!byBuilding[n]) byBuilding[n] = []; });
+      }
+      // Prefer projectBuildings order
+      if (typeof projectBuildings !== 'undefined' && projectBuildings.length > 1) {
+        const ordered = [];
+        projectBuildings.forEach(b => {
+          const n = b.name || 'Building';
+          if (byBuilding[n] && ordered.indexOf(n) < 0) ordered.push(n);
+        });
+        buildingNames.forEach(n => { if (ordered.indexOf(n) < 0) ordered.push(n); });
+        buildingNames = ordered;
+      }
+      const multi = buildingNames.length > 1;
+
+      const buildSummaryBody = (label, sorted, showMarkups) => {
+        let body = '';
+        body += row(cellS('SUMMARY', 'h1') + cellEmpty('h1') + cellEmpty('h1'));
+        body += row(cellS(label, 'meta') + cellEmpty('meta') + cellEmpty('meta'));
+        body += row(cellS(''));
+        body += row(cellS('Bill No.', 'th') + cellS('Description', 'th') + cellS('Amount (' + cur + ')', 'th'));
+        const bySec = {};
+        sorted.forEach(it => {
+          const sec = it.section || 'Other';
+          bySec[sec] = (bySec[sec] || 0) + (Number(it.amount) || 0);
+        });
+        let billNo = 0;
+        let works = 0;
+        orderKeys.forEach(sec => {
+          if (bySec[sec] == null) return;
+          billNo++;
+          works += bySec[sec];
+          body += row(cellS(String(billNo), 'bold') + cellS(billTitle(sec)) + cellN(bySec[sec], 'num'));
+        });
+        Object.keys(bySec).forEach(sec => {
+          if (orderKeys.indexOf(sec) >= 0) return;
+          billNo++;
+          works += bySec[sec];
+          body += row(cellS(String(billNo), 'bold') + cellS(billTitle(sec)) + cellN(bySec[sec], 'num'));
+        });
+        body += row(cellS('') + cellS('Works subtotal', 'bold') + cellN(works, 'bold'));
+        if (showMarkups) {
+          const aC = works * (1 + contPct / 100);
+          const aO = aC * (1 + opPct / 100);
+          const g = aO * (1 + vatPct / 100);
+          body += row(cellS('') + cellS('Contingency (' + contPct + '%)') + cellN(aC - works, 'num'));
+          body += row(cellS('') + cellS('Overhead and profit (' + opPct + '%)') + cellN(aO - aC, 'num'));
+          body += row(cellS('') + cellS('Total before VAT') + cellN(aO, 'num'));
+          body += row(cellS('') + cellS('VAT (' + vatPct + '%)') + cellN(g - aO, 'num'));
+          body += row(cellS('') + cellS('GRAND TOTAL', 'total') + cellN(g, 'total'));
+        } else {
+          body += row(cellS('') + cellS('TOTAL (this building)', 'total') + cellN(works, 'total'));
+        }
+        return body;
+      };
+
+      const buildBoqBody = (label, sorted) => {
+        let body = '';
+        body += row(cellS('BILL OF QUANTITIES', 'h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1'));
+        body += row(cellS(label + '  |  ' + city + '  |  ' + date, 'meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta'));
+        body += row(cellS('Item', 'th') + cellS('Description', 'th') + cellS('Unit', 'th') + cellS('Qty', 'th') + cellS('Rate (' + cur + ')', 'th') + cellS('Amount (' + cur + ')', 'th'));
+        let currentSec = '';
+        let itemNo = 0;
+        let billNo = 0;
+        let billSum = 0;
+        let works = 0;
+        const flushBill = () => {
+          if (!currentSec) return;
+          body += row(cellEmpty('bold') + cellS('TOTAL CARRIED TO SUMMARY — ' + billTitle(currentSec), 'bold') + cellEmpty('bold') + cellEmpty('bold') + cellEmpty('bold') + cellN(billSum, 'bold'));
+          body += row(cellS(''));
+        };
+        sorted.forEach(it => {
+          const sec = it.section || 'Other';
+          if (sec !== currentSec) {
+            flushBill();
+            currentSec = sec;
+            billNo++;
+            itemNo = 0;
+            billSum = 0;
+            body += row(cellS('BILL NO. ' + billNo + ' — ' + billTitle(sec), 'sec') + cellEmpty('sec') + cellEmpty('sec') + cellEmpty('sec') + cellEmpty('sec') + cellEmpty('sec'));
+          }
+          itemNo++;
+          const amt = Number(it.amount) || 0;
+          billSum += amt;
+          works += amt;
+          const code = billNo + '.' + String(itemNo).padStart(2, '0');
+          const desc = cleanDesc(it.desc);
+          // Row height so long descriptions stay visible (wrap)
+          const h = Math.min(96, Math.max(20, 14 + Math.ceil(desc.length / 42) * 13));
+          body += row(
+            cellS(code) +
+            cellS(desc, 'desc') +
+            cellS(it.unit || '') +
+            cellN(it.qty, 'num') +
+            cellN(it.rate, 'num') +
+            cellN(amt, 'num'),
+            h
+          );
+        });
+        flushBill();
+        body += row(cellEmpty('total') + cellS('WORKS SUBTOTAL — carried to Summary', 'total') + cellEmpty('total') + cellEmpty('total') + cellEmpty('total') + cellN(works, 'total'));
+        return body;
+      };
+
+      const buildTakeoffBody = (label, takeoffMap) => {
+        let body = '';
+        body += row(cellS('QUANTITY TAKEOFF', 'h1') + cellEmpty('h1'));
+        body += row(cellS(label, 'meta') + cellEmpty('meta'));
+        body += row(cellS('Item', 'th') + cellS('Quantity', 'th'));
+        let any = false;
+        if (takeoffMap && typeof takeoffMap === 'object') {
+          Object.keys(takeoffMap).forEach(id => {
+            const val = parseFloat(takeoffMap[id]);
+            if (!val) return;
+            any = true;
+            body += row(cellS(id.replace(/^to_/, '').replace(/_/g, ' ')) + cellN(val, 'num'));
+          });
+        }
+        if (!any) {
+          // Fall back to current form for active / single building
+          document.querySelectorAll('#tab-takeoff input[id^="to_"]').forEach(el => {
+            const val = parseFloat(el.value);
+            if (!val) return;
+            any = true;
+            body += row(cellS(el.id.replace(/^to_/, '').replace(/_/g, ' ')) + cellN(val, 'num'));
+          });
+        }
+        if (!any) body += row(cellS('(No quantities entered)') + cellS(''));
+        return body;
+      };
+
+      // ----- Cover -----
       let cover = '';
       cover += row(cellS(firm, 'title') + cellEmpty('title'));
       cover += row(cellS('BILL OF QUANTITIES', 'h1') + cellEmpty('h1'));
@@ -6406,6 +6558,9 @@
       cover += row(cellS('Location', 'label') + cellS(city));
       cover += row(cellS('Building type', 'label') + cellS(btype));
       cover += row(cellS('GFA / Floors', 'label') + cellS(String(gfa) + ' m2 / ' + floorLabel));
+      if (multi) {
+        cover += row(cellS('Buildings', 'label') + cellS(buildingNames.join(', ')));
+      }
       cover += row(cellS('Method of measurement', 'label') + cellS(mom));
       cover += row(cellS('Rates reference', 'label') + cellS(ratesDate));
       cover += row(cellS('Date', 'label') + cellS(date));
@@ -6413,112 +6568,55 @@
       cover += row(cellS(''));
       cover += row(cellS('PROJECT TOTAL (' + cur + ')', 'total') + cellN(grand, 'total'));
       cover += row(cellS(''));
-      cover += row(cellS('Notes', 'meta') + cellS('Quantities are provisional. Rates are indicative market estimates.', 'meta'));
-      cover += row(cellS('') + cellS('This document is for estimation / tender preparation purposes.', 'meta'));
+      cover += row(cellS('Notes', 'meta') + cellS('Each building has its own Summary, BOQ and Takeoff sheets.', 'meta'));
+      cover += row(cellS('') + cellS('Quantities are provisional. Rates are indicative market estimates.', 'meta'));
 
-      // ========== 2. COLLECTION ==========
-      let collection = '';
-      collection += row(cellS('COLLECTION / SUMMARY', 'h1') + cellEmpty('h1') + cellEmpty('h1'));
-      collection += row(cellS('Project: ' + name, 'meta') + cellEmpty('meta') + cellEmpty('meta'));
-      collection += row(cellS(''));
-      collection += row(cellS('Bill No.', 'th') + cellS('Description', 'th') + cellS('Amount (' + cur + ')', 'th'));
-
-      const bySec = {};
-      sortedItems.forEach(it => {
-        const sec = it.section || 'Other';
-        bySec[sec] = (bySec[sec] || 0) + (Number(it.amount) || 0);
-      });
-      let billNo = 0;
-      orderKeys.forEach(sec => {
-        if (bySec[sec] == null) return;
-        billNo++;
-        collection += row(cellS(String(billNo), 'bold') + cellS(billTitle(sec)) + cellN(bySec[sec], 'num'));
-      });
-      Object.keys(bySec).forEach(sec => {
-        if (orderKeys.indexOf(sec) >= 0) return;
-        billNo++;
-        collection += row(cellS(String(billNo), 'bold') + cellS(billTitle(sec)) + cellN(bySec[sec], 'num'));
-      });
-      collection += row(cellS('') + cellS('Works subtotal', 'bold') + cellN(subtotal, 'bold'));
-      collection += row(cellS('') + cellS('Contingency (' + contPct + '%)') + cellN(afterC - subtotal, 'num'));
-      collection += row(cellS('') + cellS('Overhead and profit (' + opPct + '%)') + cellN(afterO - afterC, 'num'));
-      collection += row(cellS('') + cellS('Total before VAT') + cellN(afterO, 'num'));
-      collection += row(cellS('') + cellS('VAT (' + vatPct + '%)') + cellN(grand - afterO, 'num'));
-      collection += row(cellS('') + cellS('GRAND TOTAL', 'total') + cellN(grand, 'total'));
-      const gfaNum = Number(gfa) || 0;
-      if (gfaNum > 0) {
-        collection += row(cellS('') + cellS('Cost per m2') + cellN(grand / gfaNum, 'num'));
+      // ----- Project Summary (all buildings) -----
+      let projectSummary = '';
+      projectSummary += row(cellS('SUMMARY', 'h1') + cellEmpty('h1') + cellEmpty('h1'));
+      projectSummary += row(cellS('Project: ' + name + (multi ? ' — all buildings' : ''), 'meta') + cellEmpty('meta') + cellEmpty('meta'));
+      projectSummary += row(cellS(''));
+      if (multi) {
+        projectSummary += row(cellS('No.', 'th') + cellS('Building', 'th') + cellS('Amount (' + cur + ')', 'th'));
+        let bi = 0;
+        buildingNames.forEach(bn => {
+          bi++;
+          const sum = (byBuilding[bn] || []).reduce((s, it) => s + (Number(it.amount) || 0), 0);
+          projectSummary += row(cellS(String(bi), 'bold') + cellS(bn) + cellN(sum, 'num'));
+        });
+        projectSummary += row(cellS('') + cellS('Works subtotal (all buildings)', 'bold') + cellN(subtotalAll, 'bold'));
+      } else {
+        projectSummary += buildSummaryBody(name, sortItems(items), false);
+        // rebuild markups on single-building project summary only once
+        projectSummary = '';
+        projectSummary += buildSummaryBody('Project: ' + name, sortItems(items), true);
+      }
+      if (multi) {
+        projectSummary += row(cellS('') + cellS('Contingency (' + contPct + '%)') + cellN(afterC - subtotalAll, 'num'));
+        projectSummary += row(cellS('') + cellS('Overhead and profit (' + opPct + '%)') + cellN(afterO - afterC, 'num'));
+        projectSummary += row(cellS('') + cellS('Total before VAT') + cellN(afterO, 'num'));
+        projectSummary += row(cellS('') + cellS('VAT (' + vatPct + '%)') + cellN(grand - afterO, 'num'));
+        projectSummary += row(cellS('') + cellS('GRAND TOTAL', 'total') + cellN(grand, 'total'));
+        const gfaNum = Number(gfa) || 0;
+        if (gfaNum > 0) projectSummary += row(cellS('') + cellS('Cost per m2 (project)') + cellN(grand / gfaNum, 'num'));
       }
 
-      // ========== 3. BOQ ==========
-      let boq = '';
-      boq += row(cellS('BILL OF QUANTITIES', 'h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1'));
-      boq += row(cellS(name + '  |  ' + city + '  |  ' + date, 'meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta'));
-      boq += row(cellS('Item', 'th') + cellS('Description', 'th') + cellS('Unit', 'th') + cellS('Qty', 'th') + cellS('Rate (' + cur + ')', 'th') + cellS('Amount (' + cur + ')', 'th'));
-
-      let currentSec = '';
-      let itemNo = 0;
-      billNo = 0;
-      let billSum = 0;
-      const flushBill = () => {
-        if (!currentSec) return;
-        boq += row(cellEmpty('bold') + cellS('TOTAL CARRIED TO SUMMARY — ' + billTitle(currentSec), 'bold') + cellEmpty('bold') + cellEmpty('bold') + cellEmpty('bold') + cellN(billSum, 'bold'));
-        boq += row(cellS(''));
-      };
-      sortedItems.forEach(it => {
-        const sec = it.section || 'Other';
-        if (sec !== currentSec) {
-          flushBill();
-          currentSec = sec;
-          billNo++;
-          itemNo = 0;
-          billSum = 0;
-          boq += row(cellS('BILL NO. ' + billNo + ' — ' + billTitle(sec), 'sec') + cellEmpty('sec') + cellEmpty('sec') + cellEmpty('sec') + cellEmpty('sec') + cellEmpty('sec'));
-        }
-        itemNo++;
-        billSum += Number(it.amount) || 0;
-        const code = billNo + '.' + String(itemNo).padStart(2, '0');
-        boq += row(
-          cellS(code) +
-          cellS(cleanDesc(it.desc), 'desc') +
-          cellS(it.unit || '') +
-          cellN(it.qty, 'num') +
-          cellN(it.rate, 'num') +
-          cellN(it.amount, 'num')
-        );
-      });
-      flushBill();
-      boq += row(cellEmpty('total') + cellS('WORKS SUBTOTAL — carried to Collection', 'total') + cellEmpty('total') + cellEmpty('total') + cellEmpty('total') + cellN(subtotal, 'total'));
-
-      // ========== 4. TAKEOFF ==========
-      let takeoff = '';
-      takeoff += row(cellS('QUANTITY TAKEOFF', 'h1') + cellEmpty('h1'));
-      takeoff += row(cellS('Reference inputs used to generate the BOQ', 'meta') + cellEmpty('meta'));
-      takeoff += row(cellS('Item', 'th') + cellS('Quantity', 'th'));
-      document.querySelectorAll('#tab-takeoff input[id^="to_"]').forEach(el => {
-        const val = parseFloat(el.value);
-        if (!val) return;
-        const id = el.id.replace(/^to_/, '').replace(/_/g, ' ');
-        takeoff += row(cellS(id) + cellN(val, 'num'));
-      });
-
-      // ========== 5. RATES ==========
+      // ----- Rates / Resources / Rebar / Cert (shared, project-level) -----
       let rates = '';
       rates += row(cellS('UNIT RATES', 'h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1'));
-      rates += row(cellS('Built from resource prices and market data (' + ratesDate + ')', 'meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta'));
+      rates += row(cellS('Project rates (' + ratesDate + ') — apply to all buildings', 'meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta'));
       rates += row(cellS('Code', 'th') + cellS('Description', 'th') + cellS('Unit', 'th') + cellS('Rate (' + cur + ')', 'th'));
       if (typeof BASE_RATES !== 'undefined') {
         Object.keys(BASE_RATES).forEach(k => {
           const b = BASE_RATES[k];
           if (!b) return;
-          rates += row(cellS(k) + cellS(b.desc || '') + cellS(b.unit || '') + cellN(b.rate, 'num'));
+          rates += row(cellS(k) + cellS(b.desc || '', 'desc') + cellS(b.unit || '') + cellN(b.rate, 'num'), Math.min(60, 18 + Math.ceil(String(b.desc||'').length/50)*12));
         });
       }
 
-      // ========== 6. RESOURCES ==========
       let resources = '';
       resources += row(cellS('RESOURCE PRICES', 'h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1'));
-      resources += row(cellS('Material, manpower and machinery — indicative Addis market', 'meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta'));
+      resources += row(cellS('Material, manpower and machinery — indicative market', 'meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta'));
       resources += row(cellS('Resource', 'th') + cellS('Category', 'th') + cellS('Unit', 'th') + cellS('Price (' + cur + ')', 'th'));
       try {
         const res = (typeof getResources === 'function') ? getResources() : {};
@@ -6529,7 +6627,6 @@
         });
       } catch (e) {}
 
-      // ========== 7. REBAR ==========
       let rebar = '';
       rebar += row(cellS('REINFORCEMENT SCHEDULE', 'h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1'));
       rebar += row(cellS('Main bars + stirrups/links by member', 'meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta'));
@@ -6547,7 +6644,6 @@
       rebar += row(cellS('TOTAL', 'total') + cellEmpty('total') + cellEmpty('total') + cellEmpty('total') + cellEmpty('total') + cellEmpty('total') + cellEmpty('total') + cellEmpty('total') + cellN(tkg, 'total'));
       rebar += row(cellS('Tonnes') + cellN(Math.round(tkg / 10) / 100));
 
-      // ========== 8. CERTIFICATION ==========
       let cert = '';
       cert += row(cellS('CERTIFICATION', 'h1') + cellEmpty('h1'));
       cert += row(cellS(''));
@@ -6559,6 +6655,41 @@
       cert += row(cellS('Signature', 'label') + cellS('................................'));
       cert += row(cellS(''));
       cert += row(cellS('Company stamp', 'meta') + cellS(''));
+
+      // Assemble worksheets
+      let sheetsXml = '';
+      sheetsXml += sheet('Cover', cols([160, 320]), cover);
+      sheetsXml += sheet('Summary', cols([70, 340, 120]), projectSummary);
+
+      if (multi) {
+        buildingNames.forEach((bn, idx) => {
+          const sorted = sortItems(byBuilding[bn] || []);
+          const tag = (idx + 1) + ' ' + bn;
+          sheetsXml += sheet('Sum ' + tag, cols([70, 340, 120]), buildSummaryBody('Building: ' + bn, sorted, true));
+          sheetsXml += sheet('BOQ ' + tag, cols([48, 380, 42, 60, 78, 90]), buildBoqBody(name + ' — ' + bn, sorted));
+          // Takeoff from saved building data if any
+          let tMap = null;
+          if (typeof projectBuildings !== 'undefined') {
+            const pb = projectBuildings.find(b => (b.name || '') === bn);
+            if (pb && pb.takeoff) tMap = pb.takeoff;
+          }
+          sheetsXml += sheet('TO ' + tag, cols([220, 100]), buildTakeoffBody('Building: ' + bn, tMap));
+        });
+      } else {
+        const bn = buildingNames[0] || 'Main building';
+        const sorted = sortItems(byBuilding[bn] || items);
+        sheetsXml += sheet('BOQ', cols([48, 380, 42, 60, 78, 90]), buildBoqBody(name + (bn ? ' — ' + bn : ''), sorted));
+        let tMap = null;
+        if (typeof projectBuildings !== 'undefined' && projectBuildings[0] && projectBuildings[0].takeoff) {
+          tMap = projectBuildings[0].takeoff;
+        }
+        sheetsXml += sheet('Takeoff', cols([220, 100]), buildTakeoffBody(name, tMap));
+      }
+
+      sheetsXml += sheet('Rates', cols([100, 300, 50, 90]), rates);
+      sheetsXml += sheet('Resources', cols([220, 90, 50, 90]), resources);
+      sheetsXml += sheet('Rebar', cols([100, 70, 40, 90, 55, 45, 40, 50, 70]), rebar);
+      sheetsXml += sheet('Certification', cols([140, 280]), cert);
 
       const xml =
         '<?xml version="1.0"?>\r\n' +
@@ -6577,7 +6708,7 @@
         ' <Style ss:ID="Default" ss:Name="Normal"><Font ss:FontName="Arial" ss:Size="10"/><Alignment ss:Vertical="Center"/></Style>\r\n' +
         ' <Style ss:ID="title"><Font ss:FontName="Arial" ss:Bold="1" ss:Size="16" ss:Color="#1E3A5F"/></Style>\r\n' +
         ' <Style ss:ID="h1"><Font ss:FontName="Arial" ss:Bold="1" ss:Size="12" ss:Color="#FFFFFF"/><Interior ss:Color="#1E3A5F" ss:Pattern="Solid"/></Style>\r\n' +
-        ' <Style ss:ID="th"><Font ss:FontName="Arial" ss:Bold="1" ss:Size="10" ss:Color="#FFFFFF"/><Interior ss:Color="#334155" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>\r\n' +
+        ' <Style ss:ID="th"><Font ss:FontName="Arial" ss:Bold="1" ss:Size="10" ss:Color="#FFFFFF"/><Interior ss:Color="#334155" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/></Style>\r\n' +
         ' <Style ss:ID="sec"><Font ss:FontName="Arial" ss:Bold="1" ss:Size="10" ss:Color="#0F172A"/><Interior ss:Color="#BFDBFE" ss:Pattern="Solid"/></Style>\r\n' +
         ' <Style ss:ID="label"><Font ss:FontName="Arial" ss:Size="10" ss:Color="#475569"/></Style>\r\n' +
         ' <Style ss:ID="bold"><Font ss:FontName="Arial" ss:Bold="1" ss:Size="10"/><NumberFormat ss:Format="#,##0"/></Style>\r\n' +
@@ -6586,14 +6717,7 @@
         ' <Style ss:ID="desc"><Font ss:FontName="Arial" ss:Size="9"/><Alignment ss:Vertical="Top" ss:WrapText="1"/></Style>\r\n' +
         ' <Style ss:ID="meta"><Font ss:FontName="Arial" ss:Size="9" ss:Italic="1" ss:Color="#64748B"/></Style>\r\n' +
         '</Styles>\r\n' +
-        sheet('Cover', cols([160, 320]), cover) +
-        sheet('Collection', cols([70, 320, 120]), collection) +
-        sheet('BOQ', cols([50, 300, 45, 70, 85, 95]), boq) +
-        sheet('Takeoff', cols([220, 100]), takeoff) +
-        sheet('Rates', cols([100, 280, 50, 90]), rates) +
-        sheet('Resources', cols([220, 90, 50, 90]), resources) +
-        sheet('Rebar', cols([100, 70, 40, 90, 55, 45, 40, 50, 70]), rebar) +
-        sheet('Certification', cols([140, 280]), cert) +
+        sheetsXml +
         '</Workbook>';
 
       const blob = new Blob([xml], { type: 'application/vnd.ms-excel' });
@@ -6606,6 +6730,7 @@
       URL.revokeObjectURL(a.href);
       showToast('Professional Excel BOQ downloaded');
     }
+
 
 
 
