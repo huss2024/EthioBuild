@@ -408,7 +408,7 @@
     </nav>
 
     <main class="max-w-7xl mx-auto px-3 sm:px-4 py-5">
-      <details id="tab-setup" class="section-collapse tab-content py-2 border-t border-gray-100 dark:border-gray-800" open>
+      <details id="tab-setup" class="section-collapse tab-content py-2 border-t border-gray-100 dark:border-gray-800">
         <summary class="onepage-heading max-w-7xl mx-auto px-3 mb-2 py-2 sticky top-12 z-30 bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur">
           <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100 border-l-4 border-blue-600 pl-3 flex items-center gap-2">
             <span class="collapse-arrow text-blue-600 text-sm">▼</span> 1. Project Setup
@@ -1197,7 +1197,7 @@
       </details>
 
 
-      <details id="tab-takeoff" class="section-collapse tab-content py-2 border-t border-gray-100 dark:border-gray-800" open>
+      <details id="tab-takeoff" class="section-collapse tab-content py-2 border-t border-gray-100 dark:border-gray-800">
         <summary class="onepage-heading max-w-7xl mx-auto px-3 mb-2 py-2 sticky top-12 z-30 bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur">
           <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100 border-l-4 border-blue-600 pl-3 flex items-center gap-2">
             <span class="collapse-arrow text-blue-600 text-sm">▼</span> 2. Quantity Takeoff
@@ -1220,7 +1220,7 @@
             Tip: Click <strong>Auto-fill from GFA</strong> first for a smart starting estimate, then adjust the numbers with your real measurements.
           </div>
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Substructure</h3><p class="text-[11px] text-gray-400 mb-3">Foundation & ground works</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Excavation & disposal (m³)</label><input id="to_excavation" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1230,7 +1230,7 @@
                 <div><label class="block text-xs text-gray-500 mb-0.5">Damp-proof course (m²)</label><input id="to_dpc" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
             </details>
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>Superstructure</h3><p class="text-[11px] text-gray-400 mb-3">Frame, walls & structural elements</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">RC columns C30 (m³)</label><input id="to_columns" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1255,7 +1255,7 @@
                 <div><label class="block text-xs text-gray-500 mb-0.5">Reinforcement bars (tonne = 1000 kg)</label><input id="to_rebar" type="number" value="0" step="0.1" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
             </details>
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Finishes</h3><p class="text-[11px] text-gray-400 mb-3">Plaster, floors, ceilings & paint</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Internal plaster (m²)</label><input id="to_plaster_int" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1266,7 +1266,7 @@
                 <div><label class="block text-xs text-gray-500 mb-0.5">External painting (m²)</label><input id="to_paint_ext" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
             </details>
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Openings</h3><p class="text-[11px] text-gray-400 mb-3">Doors & windows</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">External doors (nr)</label><input id="to_doors_ext" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1274,7 +1274,7 @@
                 <div><label class="block text-xs text-gray-500 mb-0.5">Windows / glazing (m²)</label><input id="to_windows" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
             </details>
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>Mechanical & Electrical</h3><p class="text-[11px] text-gray-400 mb-3">Basic electrical & sanitary fixtures</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Socket & switch points (nr)</label><input id="to_elec_points" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1284,7 +1284,7 @@
                 <div><label class="block text-xs text-gray-500 mb-0.5">Water supply pipework (m)</label><input id="to_pipes" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
             </details>
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>Roof & External Works</h3><p class="text-[11px] text-gray-400 mb-3">Roofing, paving & boundary</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Roof covering (m²)</label><input id="to_roof" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1294,7 +1294,7 @@
             </details>
 
             <!-- Electrical detailed -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>Electrical Systems</h3><p class="text-[11px] text-gray-400 mb-3">Boards, trays & external lighting</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Main distribution board (nr)</label><input id="to_main_board" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1305,7 +1305,7 @@
             </details>
 
             <!-- Plumbing detailed -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>Plumbing & Sanitary</h3><p class="text-[11px] text-gray-400 mb-3">Tanks, pumps & drainage</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Water storage tank (nr)</label><input id="to_water_tank" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1315,7 +1315,7 @@
             </details>
 
             <!-- HVAC -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>HVAC Systems</h3><p class="text-[11px] text-gray-400 mb-3">Air conditioning & ventilation</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Split AC units (nr)</label><input id="to_ac_split" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1326,7 +1326,7 @@
             </details>
 
             <!-- Lifts -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span>Lifts / Elevators</h3><p class="text-[11px] text-gray-400 mb-3">Passenger & service lifts</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Passenger lifts (nr)</label><input id="to_lift_passenger" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1336,7 +1336,7 @@
             </details>
 
             <!-- Fire Protection -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Fire Protection</h3><p class="text-[11px] text-gray-400 mb-3">Alarm, hose reels, sprinklers</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Fire alarm coverage (m²)</label><input id="to_fire_alarm" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1347,7 +1347,7 @@
             </details>
 
             <!-- Special Systems -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-pink-500"></span>Special Systems</h3><p class="text-[11px] text-gray-400 mb-3">Generator & solar</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Standby generator (nr)</label><input id="to_generator" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1356,7 +1356,7 @@
             </details>
 
             <!-- Hospital Systems -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>Hospital / Health Systems</h3><p class="text-[11px] text-gray-400 mb-3">OT, radiology, ICU, lab, medical gas</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Operating theatre OT (nr)</label><input id="to_operating_theatre" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1376,7 +1376,7 @@
             </details>
 
             <!-- Industrial Systems -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Industrial Systems</h3><p class="text-[11px] text-gray-400 mb-3">Cranes, heavy power, special flooring</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Heavy power supply (kVA)</label><input id="to_heavy_power" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1393,7 +1393,7 @@
             </details>
 
             <!-- Steel Structure (large span) -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>Steel Structure (Large Span)</h3><p class="text-[11px] text-gray-400 mb-3">Portal frames, cladding, crane beams</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Steel columns (tonnes)</label><input id="to_steel_column" type="number" value="0" step="0.1" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1408,7 +1408,7 @@
             </details>
 
             <!-- Foundation & Seismic upgrades -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>Foundation & Seismic Upgrades</h3><p class="text-[11px] text-gray-400 mb-3">Raft, piles & seismic detailing</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Raft foundation extra (m²)</label><input id="to_raft_extra" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1423,7 +1423,7 @@
             </details>
 
             <!-- Stairs & Vertical Circulation -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>Stairs & Vertical Circulation</h3><p class="text-[11px] text-gray-400 mb-3">Stair type, dimensions, finishes & handrails</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div>
@@ -1482,7 +1482,7 @@
 
             
             <!-- Site works, pools, gas, landscape -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-lime-600"></span>Site works · Pool · Gas station · Landscape</h3><p class="text-[11px] text-gray-400 mb-3">External works beyond the main building</p></summary>
               <div class="space-y-2 text-sm">
                 <div class="grid grid-cols-2 gap-2">
@@ -1545,7 +1545,7 @@
             </details>
 
             <!-- Room Finishes (detailed) -->
-            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+            <details class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
               <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Floor finishes by area (different materials)</h3><p class="text-[11px] text-gray-400 mb-3">Buildings usually have different floor finishes per zone. Choose material and enter area (m²) for each — leave blank to auto-estimate from GFA where applicable.</p></summary>
               <div class="grid sm:grid-cols-2 gap-2.5 text-sm mb-3">
                 <div>
@@ -4992,6 +4992,46 @@
       }
     }
 
+    
+    function showBoqReplaceConfirm(n) {
+      let overlay = document.getElementById('boqReplaceModal');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'boqReplaceModal';
+        overlay.innerHTML = `
+          <div class="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/50" data-boq-overlay="1">
+            <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full p-5 border border-gray-200 dark:border-gray-700">
+              <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-2">Replace existing BOQ?</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-1">Current BOQ has <strong id="boqReplaceCount">0</strong> items.</p>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Generate again will rebuild the bill from takeoff (all buildings). Use <strong>Undo last Generate BOQ</strong> if this was a mistake.</p>
+              <div class="flex gap-2 justify-end">
+                <button type="button" id="boqReplaceCancel" class="px-4 py-2 rounded-xl text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">Cancel</button>
+                <button type="button" id="boqReplaceOk" class="px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600 text-white">Generate &amp; replace</button>
+              </div>
+            </div>
+          </div>`;
+        document.body.appendChild(overlay);
+        overlay.querySelector('#boqReplaceCancel').onclick = () => {
+          overlay.style.display = 'none';
+          showToast('Generate cancelled — BOQ unchanged');
+        };
+        overlay.querySelector('#boqReplaceOk').onclick = () => {
+          overlay.style.display = 'none';
+          window._boqGenerateForce = true;
+          generateFromTakeoff();
+        };
+        overlay.querySelector('[data-boq-overlay]').addEventListener('click', (e) => {
+          if (e.target.getAttribute('data-boq-overlay')) {
+            overlay.style.display = 'none';
+            showToast('Generate cancelled — BOQ unchanged');
+          }
+        });
+      }
+      const c = document.getElementById('boqReplaceCount');
+      if (c) c.textContent = String(n);
+      overlay.style.display = 'block';
+    }
+
     function undoLastBoqGenerate() {
       if (!window._boqUndoStack || !window._boqUndoStack.length) {
         showToast('Nothing to undo — no previous BOQ saved');
@@ -5005,18 +5045,13 @@
     }
     function generateFromTakeoff() {
       try {
-      // Confirm if a BOQ already exists (avoids accidental overwrite)
-      if (typeof boqItems !== 'undefined' && boqItems.length > 0) {
-        const ok = confirm(
-          'A BOQ already has ' + boqItems.length + ' items.\n\n' +
-          'Generate again and replace it?\n\n' +
-          'Tip: If this was a mistake, click Cancel — or use "Undo last Generate BOQ" after generating.'
-        );
-        if (!ok) {
-          showToast('Generate cancelled — BOQ unchanged');
-          return;
-        }
+      // Soft in-app confirm (not browser alert) if BOQ already exists
+      if (!window._boqGenerateForce && typeof boqItems !== 'undefined' && boqItems.length > 0) {
+        showBoqReplaceConfirm(boqItems.length);
+        return;
       }
+      window._boqGenerateForce = false;
+
       // Snapshot current BOQ for undo
       try {
         window._boqUndoStack = window._boqUndoStack || [];
@@ -6485,7 +6520,7 @@
         let works = 0;
         const flushBill = () => {
           if (!currentSec) return;
-          body += row(cellEmpty('bold') + cellS('TOTAL CARRIED TO SUMMARY — ' + billTitle(currentSec), 'bold') + cellEmpty('bold') + cellEmpty('bold') + cellEmpty('bold') + cellN(billSum, 'bold'));
+          body += row(cellEmpty('bold') + cellS('TOTAL CARRIED TO SUMMARY', 'bold') + cellEmpty('bold') + cellEmpty('bold') + cellEmpty('bold') + cellN(billSum, 'bold'));
           body += row(cellS(''));
         };
         sorted.forEach(it => {
