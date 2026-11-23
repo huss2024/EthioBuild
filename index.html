@@ -174,6 +174,17 @@
     }
     .dark .eb-calc-tools input { background: #1e293b; border-color: #334155; color: #e2e8f0; }
 
+  
+    /* Takeoff collapsible cards */
+    details.takeoff-card > summary {
+      list-style: none; cursor: pointer; user-select: none;
+    }
+    details.takeoff-card > summary::-webkit-details-marker { display: none; }
+    details.takeoff-card > summary .to-arrow {
+      display: inline-block; transition: transform 0.15s; color: #2563eb;
+    }
+    details.takeoff-card:not([open]) > summary .to-arrow { transform: rotate(-90deg); }
+
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen">
@@ -1175,6 +1186,8 @@
               <p class="text-xs text-gray-500 mb-3">Recommended order for new projects</p>
               <button onclick="autoEstimateFromGFA()" class="w-full py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-medium text-sm mb-2">1. Auto-fill Takeoff from GFA</button>
               <button onclick="generateFromTakeoff()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium text-sm mb-2">2. Generate BOQ from Takeoff</button>
+              <button type="button" onclick="undoLastBoqGenerate()" class="w-full py-2 bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-700 rounded-xl font-medium text-sm mb-2">Undo last Generate BOQ</button>
+              <p class="text-[10px] text-gray-500 mb-2">If you click Generate by mistake, use <strong>Undo last Generate BOQ</strong> to restore the previous bill.</p>
               <button onclick="document.querySelector('[data-tab=summary]').click()" class="w-full py-2.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-xl font-medium text-sm">3. View Summary & Charts</button>
             </div>
           </div>
@@ -1207,22 +1220,22 @@
             Tip: Click <strong>Auto-fill from GFA</strong> first for a smart starting estimate, then adjust the numbers with your real measurements.
           </div>
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Substructure</h3><p class="text-[11px] text-gray-400 mb-3">Foundation & ground works</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Substructure</h3><p class="text-[11px] text-gray-400 mb-3">Foundation & ground works</p></summary>
               <div class="space-y-2.5 text-sm">
-                <div><label class="block text-xs text-gray-500 mb-0.5">Excavation & disposal (m³)</label><input id="to_excavation" type="number" value="180" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Foundation concrete C25 (m³)</label><input id="to_found_concrete" type="number" value="45" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Excavation & disposal (m³)</label><input id="to_excavation" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Foundation concrete C25 (m³)</label><input id="to_found_concrete" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Foundation masonry / trench stonework (m³)</label><input id="to_found_masonry" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800" title="Stone or block masonry in foundation trenches (no pad footings)"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Hardcore filling — trachytic stone (m³)</label><input id="to_hardcore" type="number" value="60" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Damp-proof course (m²)</label><input id="to_dpc" type="number" value="120" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Hardcore filling — trachytic stone (m³)</label><input id="to_hardcore" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Damp-proof course (m²)</label><input id="to_dpc" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>Superstructure</h3><p class="text-[11px] text-gray-400 mb-3">Frame, walls & structural elements</p>
+            </details>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>Superstructure</h3><p class="text-[11px] text-gray-400 mb-3">Frame, walls & structural elements</p></summary>
               <div class="space-y-2.5 text-sm">
-                <div><label class="block text-xs text-gray-500 mb-0.5">RC columns C30 (m³)</label><input id="to_columns" type="number" value="28" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">RC beams C30 (m³)</label><input id="to_beams" type="number" value="35" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">RC slabs — conventional (m³)</label><input id="to_slabs" type="number" value="95" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">RC columns C30 (m³)</label><input id="to_columns" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">RC beams C30 (m³)</label><input id="to_beams" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">RC slabs — conventional (m³)</label><input id="to_slabs" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div>
                   <label class="block text-xs text-gray-500 mb-0.5">Slab system</label>
                   <select id="to_slab_system" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
@@ -1235,116 +1248,116 @@
                 <div><label class="block text-xs text-gray-500 mb-0.5">PT strand / tendon (kg)</label><input id="to_pt_tendon" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">PT anchorages (nr)</label><input id="to_pt_anchor" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">PT duct grouting (m)</label><input id="to_pt_grout" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Block walling (m²)</label><input id="to_blockwork" type="number" value="680" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Block walling (m²)</label><input id="to_blockwork" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                   <div><label class="block text-xs text-gray-500 mb-0.5">Brickwork (m²)</label><input id="to_brickwork" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                   <div><label class="block text-xs text-gray-500 mb-0.5">Stone masonry (m³)</label><input id="to_stone_masonry" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Formwork (m²)</label><input id="to_formwork" type="number" value="520" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Reinforcement bars (tonne = 1000 kg)</label><input id="to_rebar" type="number" value="18.5" step="0.1" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Formwork (m²)</label><input id="to_formwork" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Reinforcement bars (tonne = 1000 kg)</label><input id="to_rebar" type="number" value="0" step="0.1" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Finishes</h3><p class="text-[11px] text-gray-400 mb-3">Plaster, floors, ceilings & paint</p>
+            </details>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Finishes</h3><p class="text-[11px] text-gray-400 mb-3">Plaster, floors, ceilings & paint</p></summary>
               <div class="space-y-2.5 text-sm">
-                <div><label class="block text-xs text-gray-500 mb-0.5">Internal plaster (m²)</label><input id="to_plaster_int" type="number" value="950" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">External plaster (m²)</label><input id="to_plaster_ext" type="number" value="320" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Floor finishes / tiles (m²)</label><input id="to_flooring" type="number" value="420" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Ceiling finishes (m²)</label><input id="to_ceiling" type="number" value="380" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Internal painting (m²)</label><input id="to_paint_int" type="number" value="1100" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">External painting (m²)</label><input id="to_paint_ext" type="number" value="320" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Internal plaster (m²)</label><input id="to_plaster_int" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">External plaster (m²)</label><input id="to_plaster_ext" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Floor finishes / tiles (m²)</label><input id="to_flooring" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Ceiling finishes (m²)</label><input id="to_ceiling" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Internal painting (m²)</label><input id="to_paint_int" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">External painting (m²)</label><input id="to_paint_ext" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Openings</h3><p class="text-[11px] text-gray-400 mb-3">Doors & windows</p>
+            </details>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Openings</h3><p class="text-[11px] text-gray-400 mb-3">Doors & windows</p></summary>
               <div class="space-y-2.5 text-sm">
-                <div><label class="block text-xs text-gray-500 mb-0.5">External doors (nr)</label><input id="to_doors_ext" type="number" value="4" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Internal doors (nr)</label><input id="to_doors_int" type="number" value="18" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Windows / glazing (m²)</label><input id="to_windows" type="number" value="85" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">External doors (nr)</label><input id="to_doors_ext" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Internal doors (nr)</label><input id="to_doors_int" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Windows / glazing (m²)</label><input id="to_windows" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>Mechanical & Electrical</h3><p class="text-[11px] text-gray-400 mb-3">Basic electrical & sanitary fixtures</p>
+            </details>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>Mechanical & Electrical</h3><p class="text-[11px] text-gray-400 mb-3">Basic electrical & sanitary fixtures</p></summary>
               <div class="space-y-2.5 text-sm">
-                <div><label class="block text-xs text-gray-500 mb-0.5">Socket & switch points (nr)</label><input id="to_elec_points" type="number" value="95" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Lighting points (nr)</label><input id="to_lights" type="number" value="48" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">WC suites (nr)</label><input id="to_wcs" type="number" value="6" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Wash basins / sinks (nr)</label><input id="to_basins" type="number" value="8" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Water supply pipework (m)</label><input id="to_pipes" type="number" value="280" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Socket & switch points (nr)</label><input id="to_elec_points" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Lighting points (nr)</label><input id="to_lights" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">WC suites (nr)</label><input id="to_wcs" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Wash basins / sinks (nr)</label><input id="to_basins" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Water supply pipework (m)</label><input id="to_pipes" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>Roof & External Works</h3><p class="text-[11px] text-gray-400 mb-3">Roofing, paving & boundary</p>
+            </details>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>Roof & External Works</h3><p class="text-[11px] text-gray-400 mb-3">Roofing, paving & boundary</p></summary>
               <div class="space-y-2.5 text-sm">
-                <div><label class="block text-xs text-gray-500 mb-0.5">Roof covering (m²)</label><input id="to_roof" type="number" value="160" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">External paving (m²)</label><input id="to_external" type="number" value="200" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Boundary wall (m)</label><input id="to_boundary" type="number" value="80" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Roof covering (m²)</label><input id="to_roof" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">External paving (m²)</label><input id="to_external" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Boundary wall (m)</label><input id="to_boundary" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
+            </details>
 
             <!-- Electrical detailed -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>Electrical Systems</h3><p class="text-[11px] text-gray-400 mb-3">Boards, trays & external lighting</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>Electrical Systems</h3><p class="text-[11px] text-gray-400 mb-3">Boards, trays & external lighting</p></summary>
               <div class="space-y-2.5 text-sm">
-                <div><label class="block text-xs text-gray-500 mb-0.5">Main distribution board (nr)</label><input id="to_main_board" type="number" value="1" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Sub / floor DBs (nr)</label><input id="to_distribution_board" type="number" value="4" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Cable tray / trunking (m)</label><input id="to_cable_tray" type="number" value="180" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">External / compound lights (nr)</label><input id="to_external_light" type="number" value="12" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Main distribution board (nr)</label><input id="to_main_board" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Sub / floor DBs (nr)</label><input id="to_distribution_board" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Cable tray / trunking (m)</label><input id="to_cable_tray" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">External / compound lights (nr)</label><input id="to_external_light" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
+            </details>
 
             <!-- Plumbing detailed -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>Plumbing & Sanitary</h3><p class="text-[11px] text-gray-400 mb-3">Tanks, pumps & drainage</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>Plumbing & Sanitary</h3><p class="text-[11px] text-gray-400 mb-3">Tanks, pumps & drainage</p></summary>
               <div class="space-y-2.5 text-sm">
-                <div><label class="block text-xs text-gray-500 mb-0.5">Water storage tank (nr)</label><input id="to_water_tank" type="number" value="1" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Booster / transfer pump (nr)</label><input id="to_water_pump" type="number" value="1" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Drainage Water supply pipework (m)</label><input id="to_drainage" type="number" value="150" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Water storage tank (nr)</label><input id="to_water_tank" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Booster / transfer pump (nr)</label><input id="to_water_pump" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Drainage Water supply pipework (m)</label><input id="to_drainage" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
+            </details>
 
             <!-- HVAC -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>HVAC Systems</h3><p class="text-[11px] text-gray-400 mb-3">Air conditioning & ventilation</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>HVAC Systems</h3><p class="text-[11px] text-gray-400 mb-3">Air conditioning & ventilation</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Split AC units (nr)</label><input id="to_ac_split" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">VRF / central outdoor units (nr)</label><input id="to_ac_vrf" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Ventilation / ducting (m²)</label><input id="to_ventilation" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Exhaust / extract fans (nr)</label><input id="to_exhaust_fan" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
+            </details>
 
             <!-- Lifts -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span>Lifts / Elevators</h3><p class="text-[11px] text-gray-400 mb-3">Passenger & service lifts</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span>Lifts / Elevators</h3><p class="text-[11px] text-gray-400 mb-3">Passenger & service lifts</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Passenger lifts (nr)</label><input id="to_lift_passenger" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Service / goods lifts (nr)</label><input id="to_lift_service" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Lift shaft height (m)</label><input id="to_lift_shaft" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
+            </details>
 
             <!-- Fire Protection -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Fire Protection</h3><p class="text-[11px] text-gray-400 mb-3">Alarm, hose reels, sprinklers</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Fire Protection</h3><p class="text-[11px] text-gray-400 mb-3">Alarm, hose reels, sprinklers</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Fire alarm coverage (m²)</label><input id="to_fire_alarm" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Fire hose reel cabinets (nr)</label><input id="to_fire_hose" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Sprinkler coverage (m²)</label><input id="to_sprinkler" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
-                <div><label class="block text-xs text-gray-500 mb-0.5">Portable extinguishers (nr)</label><input id="to_extinguisher" type="number" value="6" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div><label class="block text-xs text-gray-500 mb-0.5">Portable extinguishers (nr)</label><input id="to_extinguisher" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
+            </details>
 
             <!-- Special Systems -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-pink-500"></span>Special Systems</h3><p class="text-[11px] text-gray-400 mb-3">Generator & solar</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-pink-500"></span>Special Systems</h3><p class="text-[11px] text-gray-400 mb-3">Generator & solar</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Standby generator (nr)</label><input id="to_generator" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Solar PV system (kW)</label><input id="to_solar" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
+            </details>
 
             <!-- Hospital Systems -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>Hospital / Health Systems</h3><p class="text-[11px] text-gray-400 mb-3">OT, radiology, ICU, lab, medical gas</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>Hospital / Health Systems</h3><p class="text-[11px] text-gray-400 mb-3">OT, radiology, ICU, lab, medical gas</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Operating theatre OT (nr)</label><input id="to_operating_theatre" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">OT suite area (m²)</label><input id="to_ot_suite_m2" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1360,11 +1373,11 @@
                 <div><label class="block text-xs text-gray-500 mb-0.5">Clean room finishes (m²)</label><input id="to_clean_room" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Medical waste system (nr)</label><input id="to_medical_waste" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
+            </details>
 
             <!-- Industrial Systems -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Industrial Systems</h3><p class="text-[11px] text-gray-400 mb-3">Cranes, heavy power, special flooring</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Industrial Systems</h3><p class="text-[11px] text-gray-400 mb-3">Cranes, heavy power, special flooring</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Heavy power supply (kVA)</label><input id="to_heavy_power" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Overhead / gantry crane (nr)</label><input id="to_overhead_crane" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1377,11 +1390,11 @@
                 <div><label class="block text-xs text-gray-500 mb-0.5">Industrial doors (nr)</label><input id="to_industrial_door" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Mezzanine floor (m²)</label><input id="to_mezzanine" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
+            </details>
 
             <!-- Steel Structure (large span) -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>Steel Structure (Large Span)</h3><p class="text-[11px] text-gray-400 mb-3">Portal frames, cladding, crane beams</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>Steel Structure (Large Span)</h3><p class="text-[11px] text-gray-400 mb-3">Portal frames, cladding, crane beams</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Steel columns (tonnes)</label><input id="to_steel_column" type="number" value="0" step="0.1" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Steel rafters / portals (tonnes)</label><input id="to_steel_rafter" type="number" value="0" step="0.1" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1392,11 +1405,11 @@
                 <div><label class="block text-xs text-gray-500 mb-0.5">Wall cladding (m²)</label><input id="to_wall_cladding" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Crane beams (tonnes)</label><input id="to_crane_beam" type="number" value="0" step="0.1" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
+            </details>
 
             <!-- Foundation & Seismic upgrades -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>Foundation & Seismic Upgrades</h3><p class="text-[11px] text-gray-400 mb-3">Raft, piles & seismic detailing</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>Foundation & Seismic Upgrades</h3><p class="text-[11px] text-gray-400 mb-3">Raft, piles & seismic detailing</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Raft foundation extra (m²)</label><input id="to_raft_extra" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Extra bored piles (nr)</label><input id="to_pile_extra" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1407,12 +1420,11 @@
                   <div><label class="block text-xs text-gray-500 mb-0.5">Shear wall rebar (kg)</label><input id="to_shear_wall_rebar" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                   <div><label class="block text-xs text-gray-500 mb-0.5">Shear wall formwork (m²)</label><input id="to_shear_wall_formwork" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
               </div>
-            </div>
+            </details>
 
             <!-- Stairs & Vertical Circulation -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>Stairs & Vertical Circulation</h3>
-              <p class="text-[11px] text-gray-400 mb-3">Stair type, dimensions, finishes & handrails</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>Stairs & Vertical Circulation</h3><p class="text-[11px] text-gray-400 mb-3">Stair type, dimensions, finishes & handrails</p></summary>
               <div class="space-y-2.5 text-sm">
                 <div>
                   <label class="block text-xs text-gray-500 mb-0.5">Stair type</label>
@@ -1436,7 +1448,7 @@
                 </div>
                 <div>
                   <label class="block text-xs text-gray-500 mb-0.5">Number of staircases (cores)</label>
-                  <input id="to_stair_cores" type="number" min="1" value="1" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                  <input id="to_stair_cores" type="number" min="1" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
                   <p class="text-[10px] text-gray-400 mt-0.5">How many separate staircases in the building (not steps). e.g. 1 or 2</p>
                 </div>
                 <div>
@@ -1466,13 +1478,12 @@
                   <input id="to_handrail_len" type="number" min="0" value="0" placeholder="Auto from floors" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
                 </div>
               </div>
-            </div>
+            </details>
 
             
             <!-- Site works, pools, gas, landscape -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-lime-600"></span>Site works · Pool · Gas station · Landscape</h3>
-              <p class="text-[11px] text-gray-400 mb-3">External works beyond the main building</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-lime-600"></span>Site works · Pool · Gas station · Landscape</h3><p class="text-[11px] text-gray-400 mb-3">External works beyond the main building</p></summary>
               <div class="space-y-2 text-sm">
                 <div class="grid grid-cols-2 gap-2">
                   <div><label class="block text-xs text-gray-500 mb-0.5">Site clearing (m²)</label><input id="to_site_clearing" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -1531,12 +1542,11 @@
                   <div><label class="block text-xs text-gray-500 mb-0.5">Isolation m²</label><input id="to_hosp_isolation" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 </div>
               </div>
-            </div>
+            </details>
 
             <!-- Room Finishes (detailed) -->
-            <div class="border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
-              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Floor finishes by area (different materials)</h3>
-              <p class="text-[11px] text-gray-400 mb-3">Buildings usually have different floor finishes per zone. Choose material and enter area (m²) for each — leave blank to auto-estimate from GFA where applicable.</p>
+            <details open class="takeoff-card border border-slate-200 dark:border-gray-700 rounded-xl p-4 bg-slate-50/50 dark:bg-gray-800/30">
+              <summary class="mb-2"><h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><span class="to-arrow mr-1">▼</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Floor finishes by area (different materials)</h3><p class="text-[11px] text-gray-400 mb-3">Buildings usually have different floor finishes per zone. Choose material and enter area (m²) for each — leave blank to auto-estimate from GFA where applicable.</p></summary>
               <div class="grid sm:grid-cols-2 gap-2.5 text-sm mb-3">
                 <div>
                   <label class="block text-xs text-gray-500 mb-0.5">Living / reception floor</label>
@@ -1679,7 +1689,7 @@
                   </select>
                 </div>
               </div>
-            </div>
+            </details>
           </div>
         </div>
       
@@ -4982,8 +4992,38 @@
       }
     }
 
+    function undoLastBoqGenerate() {
+      if (!window._boqUndoStack || !window._boqUndoStack.length) {
+        showToast('Nothing to undo — no previous BOQ saved');
+        return;
+      }
+      const prev = window._boqUndoStack.pop();
+      boqItems = Array.isArray(prev) ? prev : [];
+      if (typeof renderBOQ === 'function') renderBOQ();
+      if (typeof recalcAll === 'function') recalcAll();
+      showToast('Restored previous BOQ (' + boqItems.length + ' items)');
+    }
     function generateFromTakeoff() {
       try {
+      // Confirm if a BOQ already exists (avoids accidental overwrite)
+      if (typeof boqItems !== 'undefined' && boqItems.length > 0) {
+        const ok = confirm(
+          'A BOQ already has ' + boqItems.length + ' items.\n\n' +
+          'Generate again and replace it?\n\n' +
+          'Tip: If this was a mistake, click Cancel — or use "Undo last Generate BOQ" after generating.'
+        );
+        if (!ok) {
+          showToast('Generate cancelled — BOQ unchanged');
+          return;
+        }
+      }
+      // Snapshot current BOQ for undo
+      try {
+        window._boqUndoStack = window._boqUndoStack || [];
+        window._boqUndoStack.push(JSON.parse(JSON.stringify(boqItems || [])));
+        if (window._boqUndoStack.length > 5) window._boqUndoStack.shift();
+      } catch (e) { window._boqUndoStack = [[]]; }
+
       // Persist active building takeoff before generating
       if (typeof projectBuildings !== 'undefined' && projectBuildings.length) {
         const prev = projectBuildings.find(b => b.active);
@@ -5468,25 +5508,57 @@
           });
         }
       }
-      const total = boqItems.reduce((s,i)=>s+i.amount,0);
-      if (total > 0) boqItems.unshift({id:'prelim', desc:'Preliminaries & General Items (allowance)', unit:'sum', qty:1, rate:Math.round(total*0.045), section:'Preliminaries', amount:Math.round(total*0.045)});
+      // Preliminaries: one allowance per building (no shared / unassigned bucket)
+      if (boqItems.length) {
+        const byB = {};
+        let noTag = 0;
+        boqItems.forEach(it => {
+          const m = /^\[([^\]]+)\]/.exec(it.desc || '');
+          if (m) byB[m[1]] = (byB[m[1]] || 0) + (Number(it.amount) || 0);
+          else noTag += (Number(it.amount) || 0);
+        });
+        // Any remaining untagged works → assign to active building name before prelim
+        const actName = (typeof projectBuildings !== 'undefined' && projectBuildings.length)
+          ? ((projectBuildings.find(b => b.active) || projectBuildings[0]).name || 'Main building')
+          : 'Main building';
+        if (noTag > 0) {
+          boqItems.forEach(it => {
+            const d = String(it.desc || '');
+            if (!/^\[[^\]]+\]/.test(d)) it.desc = '[' + actName + '] ' + d;
+          });
+          byB[actName] = (byB[actName] || 0) + noTag;
+        }
+        const names = Object.keys(byB);
+        if (names.length > 1 || (typeof projectBuildings !== 'undefined' && projectBuildings.length > 1)) {
+          names.forEach(n => {
+            const sub = byB[n] || 0;
+            if (sub <= 0) return;
+            const amt = Math.round(sub * 0.045);
+            boqItems.unshift({
+              id: newRebarId(),
+              desc: '[' + n + '] Preliminaries & General Items (allowance)',
+              unit: 'sum', qty: 1, rate: amt, section: 'Preliminaries', amount: amt
+            });
+          });
+        } else {
+          const total = boqItems.reduce((s,i)=>s+(Number(i.amount)||0),0);
+          if (total > 0) {
+            const amt = Math.round(total * 0.045);
+            const tag = (typeof projectBuildings !== 'undefined' && projectBuildings.length > 1)
+              ? ('[' + actName + '] ') : '';
+            boqItems.unshift({
+              id: 'prelim',
+              desc: tag + 'Preliminaries & General Items (allowance)',
+              unit: 'sum', qty: 1, rate: amt, section: 'Preliminaries', amount: amt
+            });
+          }
+        }
+      }
       renderBOQ(); recalcAll();
       if (!window._silentBoq) {
         document.querySelector('[data-tab="boq"]')?.click();
         
-      // Ensure multi-building tags: no orphan "Shared / not assigned" bucket from missing prefixes
-      if (typeof projectBuildings !== 'undefined' && projectBuildings.length > 1 && Array.isArray(boqItems)) {
-        const act = projectBuildings.find(b => b.active) || projectBuildings[0];
-        const defName = (act && act.name) ? act.name : 'Main building';
-        boqItems.forEach(it => {
-          const d = String(it.desc || '');
-          if (!/^\[[^\]]+\]/.test(d)) {
-            it.desc = '[' + defName + '] ' + d;
-          }
-        });
-      }
-      
-      showToast('✓ BOQ updated');
+      // showToast('✓ BOQ updated');
       }
       window._silentBoq = false;
       } catch (err) {
@@ -5620,20 +5692,21 @@
 
       // HVAC - more for commercial / hospital / hotel
       const needsHVAC = ['commercial_office','commercial_retail','hotel','hospital','mixed','school'].includes(type);
-      set('to_ac_split', needsHVAC ? Math.round(gfa/40) : (type.includes('residential') ? Math.round(gfa/80) : 0));
+      // Optional systems stay 0 for residential / warehouse unless user types a quantity
+      set('to_ac_split', needsHVAC ? Math.round(gfa/40) : 0);
       set('to_ac_vrf', (type==='hospital' || type==='hotel' || gfa>1500) ? Math.max(1, Math.round(gfa/800)) : 0);
       set('to_ventilation', needsHVAC ? Math.round(gfa*0.6) : 0);
       set('to_exhaust_fan', needsHVAC ? Math.max(2, floors) : 0);
 
-      // Lifts - for taller or special buildings
-      const needsLift = floors >= 4 || ['hospital','hotel','commercial_office','mixed'].includes(type);
+      // Lifts — only when clearly needed (never for typical G+1/G+2 residential)
+      const needsLift = floors >= 5 || ['hospital','hotel'].includes(type);
       set('to_lift_passenger', needsLift ? (floors >= 8 || type==='hospital' ? 2 : 1) : 0);
-      set('to_lift_service', (type==='hospital' || type==='hotel' || type==='industrial') ? 1 : 0);
+      set('to_lift_service', (type==='hospital' || type==='hotel') ? 1 : 0);
       set('to_lift_shaft', needsLift ? Math.round(floors * 3.5) : 0);
 
       // Fire
-      set('to_fire_alarm', (floors >= 3 || needsHVAC) ? gfa : 0);
-      set('to_fire_hose', (floors >= 3) ? Math.max(2, floors) : 0);
+      set('to_fire_alarm', (floors >= 4 || needsHVAC || type==='hospital' || type==='hotel') ? gfa : 0);
+      set('to_fire_hose', (floors >= 4 || type==='hospital' || type==='hotel') ? Math.max(2, floors) : 0);
       set('to_sprinkler', (type==='hospital' || type==='hotel' || gfa>2000) ? gfa : 0);
       set('to_extinguisher', Math.max(4, Math.round(gfa/80)));
 
@@ -5902,7 +5975,10 @@
         const names = Object.keys(map);
         if (names.length || (typeof projectBuildings !== 'undefined' && projectBuildings.length > 1)) {
           let htmlB = names.map(n => `<div class="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800"><span>${n}</span><span class="font-medium">${formatETB(map[n])}</span></div>`).join('');
-          if (untagged > 0) htmlB += `<div class="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800"><span>Shared / not assigned</span><span class="font-medium">${formatETB(untagged)}</span></div>`;
+          // Shared / unassigned should not appear — items are tagged per building on Generate
+          if (untagged > 0.5) {
+            htmlB += `<div class="flex justify-between py-1.5 border-b border-amber-100 dark:border-amber-900"><span class="text-amber-700 dark:text-amber-300">Unassigned (re-generate BOQ to fix)</span><span class="font-medium">${formatETB(untagged)}</span></div>`;
+          }
           if (!htmlB) htmlB = '<p class="text-xs text-gray-400">Generate BOQ to see building split.</p>';
           bBox.innerHTML = htmlB;
         }
