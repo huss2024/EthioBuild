@@ -185,6 +185,11 @@
     }
     details.takeoff-card:not([open]) > summary .to-arrow { transform: rotate(-90deg); }
 
+  
+    details.setup-card > summary { list-style: none; }
+    details.setup-card > summary::-webkit-details-marker { display: none; }
+    details.setup-card:not([open]) > summary .text-blue-600 { display: inline-block; transform: rotate(-90deg); }
+
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen">
@@ -422,6 +427,7 @@
               <div class="flex items-start justify-between gap-3 mb-4">
                 <div>
                   <h2 id="setupTitle" class="font-semibold">Project Information</h2>
+                  <p class="text-[11px] text-gray-500 mt-1 mb-2">Recommended order: Project info → Buildings → Specs → Rebar → Markups (sections below start collapsed).</p>
                   <p id="setupHint" class="text-xs text-gray-500 mt-0.5">Fill the basics. These affect rates and quantities.</p>
                 </div>
               </div>
@@ -679,47 +685,19 @@
               </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5">
-              <h2 class="font-semibold mb-4">Markups</h2>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div>
-                  <label class="block text-xs font-medium mb-1 text-gray-500">Contingency %</label>
-                  <input id="markupContingency" type="number" value="8" step="0.5" oninput="recalcAll()" onchange="recalcAll()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                </div>
-                <div>
-                  <label class="block text-xs font-medium mb-1 text-gray-500">O&P %</label>
-                  <input id="markupOP" type="number" value="15" step="0.5" oninput="recalcAll()" onchange="recalcAll()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                </div>
-                <div>
-                  <label class="block text-xs font-medium mb-1 text-gray-500">VAT %</label>
-                  <input id="markupVAT" type="number" value="15" step="0.5" oninput="recalcAll()" onchange="recalcAll()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                </div>
-                <div>
-                  <label class="block text-xs font-medium mb-1 text-gray-500">Waste %</label>
-                  <input id="markupWaste" type="number" value="5" step="0.5" oninput="recalcAll()" onchange="recalcAll()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="space-y-5">
-            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-2xl p-5 shadow-xl">
-              <p class="text-blue-100 text-sm">Grand Total (est.)</p>
-              <p class="text-3xl font-bold mt-1" id="quickTotal">ETB 0</p>
-              <div class="mt-4 space-y-1 text-sm text-blue-100">
-                <div class="flex justify-between"><span>Base</span><span id="quickBase">0</span></div>
-                <div class="flex justify-between"><span>+ Contingency</span><span id="quickCont">0</span></div>
-                <div class="flex justify-between"><span>+ O&P</span><span id="quickOP">0</span></div>
-              </div>
-            </div>
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 sm:col-span-2">
-              <h2 class="font-semibold mb-1">Buildings in this project</h2>
-              <p class="text-xs text-gray-500 mb-2">One project name (one payment). Add multiple buildings/blocks — costs combine in BOQ & summary.</p>
+            <details class="setup-card bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 sm:col-span-2">
+              <summary class="cursor-pointer list-none">
+                <h2 class="font-semibold mb-1 inline-flex items-center gap-2"><span class="text-blue-600 text-sm">▼</span> Buildings in this project</h2>
+                <p class="text-xs text-gray-500 mb-2">One project name (one payment). Add multiple buildings/blocks — costs combine in BOQ & summary.</p>
+              </summary>
               <div id="buildingsList" class="space-y-2 mb-2"></div>
               <button type="button" onclick="addBuilding()" class="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg font-medium">+ Add building / block</button>
               <p class="text-[11px] text-gray-400 mt-1 mb-4">Active building: <strong id="activeBuildingLabel">Main building</strong> — takeoff applies to the active building; BOQ can include all.</p>
+            </details>
 
-              <h2 class="font-semibold mb-1">Detailed specifications</h2>
+              <details class="setup-card mb-4">
+              <summary class="cursor-pointer list-none">
+              <h2 class="font-semibold mb-1 inline-flex items-center gap-2"><span class="text-blue-600 text-sm">▼</span> Detailed specifications</h2>
               <p class="text-xs text-gray-500 mb-4">Choose quality/spec for each component — rates and BOQ descriptions update to match.</p>
               <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
                 <div>
@@ -976,8 +954,11 @@
               </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 sm:col-span-2">
-              <h2 class="font-semibold mb-1">Reinforcement schedule & structural members</h2>
+            </details>
+
+<details class="setup-card bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 sm:col-span-2">
+              <summary class="cursor-pointer list-none">
+              <h2 class="font-semibold mb-1 inline-flex items-center gap-2"><span class="text-blue-600 text-sm">▼</span> Reinforcement schedule & structural members</h2>
               <p class="text-xs text-gray-500 mb-3">Enter member sizes and bar schedules. Quantities feed takeoff in <strong>tonnes</strong> (1 t = 1000 kg). Resource prices use ETB/kg with ≈ berga (12m). Cement in recipes uses ETB/50kg bag (1 quintal = 2 bags).</p>
               <div class="overflow-x-auto">
                 <table class="w-full text-xs border-collapse mb-2">
@@ -1197,7 +1178,35 @@
       </details>
 
 
-      <details id="tab-takeoff" class="section-collapse tab-content py-2 border-t border-gray-100 dark:border-gray-800">
+            <details class="setup-card bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5">
+              <summary class="cursor-pointer list-none mb-2">
+                <h2 class="font-semibold inline-flex items-center gap-2"><span class="text-blue-600 text-sm to-arrow">▼</span> Markups (contingency, O&amp;P, VAT)</h2>
+                <p class="text-xs text-gray-500 mt-1">Applied on Summary after works total — open to edit percentages.</p>
+              </summary>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+
+                <div>
+                  <label class="block text-xs font-medium mb-1 text-gray-500">Contingency %</label>
+                  <input id="markupContingency" type="number" value="8" step="0.5" oninput="recalcAll()" onchange="recalcAll()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium mb-1 text-gray-500">O&P %</label>
+                  <input id="markupOP" type="number" value="15" step="0.5" oninput="recalcAll()" onchange="recalcAll()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium mb-1 text-gray-500">VAT %</label>
+                  <input id="markupVAT" type="number" value="15" step="0.5" oninput="recalcAll()" onchange="recalcAll()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium mb-1 text-gray-500">Waste %</label>
+                  <input id="markupWaste" type="number" value="5" step="0.5" oninput="recalcAll()" onchange="recalcAll()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                
+              </div>
+            </details>
+
+
+      </details>
+<details id="tab-takeoff" class="section-collapse tab-content py-2 border-t border-gray-100 dark:border-gray-800">
         <summary class="onepage-heading max-w-7xl mx-auto px-3 mb-2 py-2 sticky top-12 z-30 bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur">
           <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100 border-l-4 border-blue-600 pl-3 flex items-center gap-2">
             <span class="collapse-arrow text-blue-600 text-sm">▼</span> 2. Quantity Takeoff
@@ -2894,10 +2903,12 @@
         const panels = Math.max(1, Math.round((r._panels != null ? r._panels : (parseFloat(document.getElementById('slabHelpNos')?.value) || 1))));
         // For -ve rows, r.nos already includes edge multiplier * panels
         const totalBars = Math.max(1, Math.round((r.label && r.label.indexOf('−ve') >= 0) ? (r.nos * nBars) : (panels * nBars)));
+        const actB = (typeof projectBuildings !== 'undefined') ? projectBuildings.find(b => b.active) : null;
         const row = {
           id: newRebarId(),
           type: 'slab_line',
           label: r.label,
+          building: (actB && actB.name) ? actB.name : 'Main building',
           _slabBatch: batchId,
           nos: totalBars,
           size: r.size,
@@ -2932,7 +2943,11 @@
         slab_neg: { type:'slab', label:'Slab -ve bars', nos:1, size:'150 thk', len:20, mainBars:0, mainDia:12, grade:'S-400', distDia:8, spacing:150 },
         slab_dist: { type:'slab', label:'Slab distribution', nos:1, size:'150 thk', len:20, mainBars:0, mainDia:8, grade:'S-300', distDia:8, spacing:200 }
       };
-      const row = Object.assign({ id: newRebarId() }, defaults[type] || defaults.column);
+      const actB = (typeof projectBuildings !== 'undefined') ? projectBuildings.find(b => b.active) : null;
+      const row = Object.assign({
+        id: newRebarId(),
+        building: (actB && actB.name) ? actB.name : 'Main building'
+      }, defaults[type] || defaults.column);
       // Prefer member-type default grade (foundation / column / beam / slab), else global auto
       const foundTypes = ['pad','raft','pile','combined'];
       const beamTypes = ['beam','strap'];
@@ -6723,7 +6738,38 @@
 
       sheetsXml += sheet('Rates', cols([100, 300, 50, 90]), rates);
       sheetsXml += sheet('Resources', cols([220, 90, 50, 90]), resources);
-      sheetsXml += sheet('Rebar', cols([100, 70, 40, 90, 55, 45, 40, 50, 70]), rebar);
+      // Rebar sheets — one per building when multi-building
+      if (multi && typeof rebarSchedule !== 'undefined' && rebarSchedule.length) {
+        const rebarByB = {};
+        rebarSchedule.forEach(r => {
+          const bn = r.building || buildingNames[0] || 'Main building';
+          if (!rebarByB[bn]) rebarByB[bn] = [];
+          rebarByB[bn].push(r);
+        });
+        let ri = 0;
+        buildingNames.forEach(bn => {
+          ri++;
+          const rows = rebarByB[bn] || [];
+          let body = '';
+          body += row(cellS('REINFORCEMENT SCHEDULE', 'h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1') + cellEmpty('h1'));
+          body += row(cellS('Building: ' + bn, 'meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta') + cellEmpty('meta'));
+          body += row(cellS('Member', 'th') + cellS('Type', 'th') + cellS('Nos', 'th') + cellS('Size', 'th') + cellS('L/Area', 'th') + cellS('Main', 'th') + cellS('Dia', 'th') + cellS('Grade', 'th') + cellS('kg', 'th'));
+          let tkg = 0;
+          rows.forEach(r => {
+            const kg = (typeof estimateRowKg === 'function') ? estimateRowKg(r) : (r.kg || 0);
+            tkg += kg;
+            body += row(
+              cellS(r.label || r.type) + cellS(r.type) + cellN(r.nos) + cellS(r.size) + cellN(r.len) +
+              cellN(r.mainBars) + cellS(String(r.mainDia)) + cellS(r.grade) + cellN(kg, 'num')
+            );
+          });
+          body += row(cellS('TOTAL', 'total') + cellEmpty('total') + cellEmpty('total') + cellEmpty('total') + cellEmpty('total') + cellEmpty('total') + cellEmpty('total') + cellEmpty('total') + cellN(tkg, 'total'));
+          body += row(cellS('Tonnes') + cellN(Math.round(tkg / 10) / 100));
+          sheetsXml += sheet('Rebar ' + ri + ' ' + bn, cols([100, 70, 40, 90, 55, 45, 40, 50, 70]), body);
+        });
+      } else {
+        sheetsXml += sheet('Rebar', cols([100, 70, 40, 90, 55, 45, 40, 50, 70]), rebar);
+      }
       sheetsXml += sheet('Certification', cols([140, 280]), cert);
 
       const xml =
