@@ -186,7 +186,14 @@
     details.takeoff-card:not([open]) > summary .to-arrow { transform: rotate(-90deg); }
 
   
-    details.setup-card > summary { list-style: none; }
+    details.setup-card > summary { list-style: none; cursor: pointer; user-select: none; }
+    details.setup-card > summary::-webkit-details-marker { display: none; }
+    details.setup-card:not([open]) > summary .to-arrow,
+    details.setup-card:not([open]) > summary .text-blue-600 { display: inline-block; transform: rotate(-90deg); }
+    details.setup-card[open] > summary .to-arrow,
+    details.setup-card[open] > summary .text-blue-600 { display: inline-block; transform: rotate(0deg); }
+    details.setup-card > summary + * { margin-top: 0.5rem; }
+
     details.setup-card > summary::-webkit-details-marker { display: none; }
     details.setup-card:not([open]) > summary .text-blue-600 { display: inline-block; transform: rotate(-90deg); }
 
@@ -697,7 +704,7 @@
 
             
 
-              <details class="setup-card mb-4">
+              <details class="setup-card bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 sm:col-span-2 mb-4">
               <summary class="cursor-pointer list-none">
               <h2 class="font-semibold mb-1 inline-flex items-center gap-2"><span class="text-blue-600 text-sm to-arrow">▼</span> Detailed specifications</h2>
               <p class="text-xs text-gray-500 mb-1">Choose quality/spec for each component — rates and BOQ descriptions update to match.</p>
@@ -1239,6 +1246,13 @@
               <div class="space-y-2.5 text-sm">
                 <div><label class="block text-xs text-gray-500 mb-0.5">Excavation & disposal (m³)</label><input id="to_excavation" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Foundation concrete C25 (m³)</label><input id="to_found_concrete" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
+                <div id="trenchFoundPanel" class="space-y-2 p-2.5 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/25">
+                  <p class="text-[10px] text-amber-900 dark:text-amber-200 font-medium">Trench / strip masonry foundation (no pad footings) — Ethiopian BOQ style</p>
+                  <div><label class="block text-xs text-gray-500 mb-0.5">Trench excavation depth (mm)</label><input id="to_trench_depth" type="number" min="300" step="50" value="1500" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"></div>
+                  <div><label class="block text-xs text-gray-500 mb-0.5">Trench excavation (m³)</label><input id="to_trench_excavation" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"></div>
+                  <div><label class="block text-xs text-gray-500 mb-0.5">Lean concrete under masonry (m³)</label><input id="to_lean_concrete" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"></div>
+                  <div><label class="block text-xs text-gray-500 mb-0.5">Backfill around foundation (m³)</label><input id="to_backfill" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"></div>
+                </div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Foundation masonry / trench stonework (m³)</label><input id="to_found_masonry" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800" title="Stone or block masonry in foundation trenches (no pad footings)"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Hardcore filling — trachytic stone (m³)</label><input id="to_hardcore" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
                 <div><label class="block text-xs text-gray-500 mb-0.5">Damp-proof course (m²)</label><input id="to_dpc" type="number" value="0" class="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
@@ -2172,24 +2186,27 @@
 
     const BASE_RATES = {
       excavation:{unit:'m³',rate:3800,section:'Substructure Earthwork',desc:'Excavation in ordinary soil to formation level; dispose surplus off site'},
-      found_concrete:{unit:'m³',rate:48000,section:'Substructure Concrete',desc:'RC foundations (C25)'},
-      hardcore:{unit:'m³',rate:9500,section:'Substructure Earthwork',desc:'Trachytic stone hardcore filling, well consolidated in layers'},
-      dpc:{unit:'m²',rate:750,section:'Substructure Earthwork',desc:'Damp-proof course'},
-      columns:{unit:'m³',rate:52000,section:'Superstructure',desc:'RC columns (C30)'},
-      beams:{unit:'m³',rate:48000,section:'Superstructure',desc:'RC beams (C30)'},
-      slabs:{unit:'m³',rate:45000,section:'Superstructure',desc:'Reinforced concrete slabs as designed; concrete only (rebar separate)'},
+      excavation_trench:{unit:'m³',rate:4200,section:'Substructure Earthwork',desc:'Excavation for foundation trench in ordinary soil to specified depth from reduced ground level; dispose surplus off site'},
+      lean_concrete:{unit:'m³',rate:28000,section:'Substructure Concrete',desc:'Lean concrete (blinding) under foundation masonry / strip walls'},
+      backfill:{unit:'m³',rate:2200,section:'Substructure Earthwork',desc:'Selected granular backfill around foundation masonry, compacted in layers'},
+      found_concrete:{unit:'m³',rate:48000,section:'Substructure Concrete',desc:'Reinforced concrete foundation pads / strip footings C25 as designed'},
+      hardcore:{unit:'m³',rate:9500,section:'Substructure Earthwork',desc:'Hardcore of basaltic / trachytic stone, well consolidated in layers'},
+      dpc:{unit:'m²',rate:750,section:'Substructure Earthwork',desc:'Damp-proof course to walls'},
+      columns:{unit:'m³',rate:52000,section:'Superstructure',desc:'Reinforced concrete columns C30 as designed'},
+      beams:{unit:'m³',rate:48000,section:'Superstructure',desc:'Reinforced concrete beams C30 as designed'},
+      slabs:{unit:'m³',rate:45000,section:'Superstructure',desc:'Reinforced concrete slabs C30 as designed (rebar measured separately)'},
       slabs_pt:{unit:'m³',rate:55000,section:'Superstructure',desc:'Post-tensioned slab concrete (higher grade; tendons separate)'},
       pt_tendon:{unit:'kg',rate:350,section:'Superstructure',desc:'Post-tensioning strand / tendon including stressing'},
       pt_anchor:{unit:'nr',rate:5500,section:'Superstructure',desc:'PT anchorage (live / dead end) complete'},
       pt_grout:{unit:'m',rate:220,section:'Superstructure',desc:'PT duct grouting after stressing'},
-      blockwork:{unit:'m²',rate:2800,section:'Superstructure',desc:'Hollow concrete block walling in cement-sand mortar; measured m² face area'},
+      blockwork:{unit:'m²',rate:2800,section:'Superstructure',desc:'Hollow concrete block walling in cement-sand mortar; measured to face area'},
       brickwork:{unit:'m²',rate:4200,section:'Superstructure',desc:'Clay brick walling'},
       stone_masonry:{unit:'m³',rate:12000,section:'Substructure Masonry',desc:'Stone / trench foundation masonry (or rubble work) in cement mortar'},
-      formwork:{unit:'m²',rate:2200,section:'Superstructure',desc:'Formwork to faces of concrete including striking; measured m² contact area'},
-      rebar:{unit:'tonne',rate:230000,section:'Superstructure',desc:'High-yield reinforcement bars including cutting, bending and fixing'},
-      plaster_int:{unit:'m²',rate:450,section:'Finishes',desc:'Internal cement plaster to walls, two coat'},
+      formwork:{unit:'m²',rate:2200,section:'Superstructure',desc:'Formwork to concrete surfaces including striking; measured to contact area'},
+      rebar:{unit:'tonne',rate:230000,section:'Superstructure',desc:'High-yield reinforcement bars including cutting, bending, binding and fixing in position'},
+      plaster_int:{unit:'m²',rate:450,section:'Finishes',desc:'Internal cement-sand plaster to walls, two coats'},
       plaster_ext:{unit:'m²',rate:520,section:'Finishes',desc:'External cement rendering / plaster to walls, two coat'},
-      flooring:{unit:'m²',rate:6200,section:'Finishes',desc:'Floor tiles including adhesive, grout and preparation'},
+      flooring:{unit:'m²',rate:6200,section:'Finishes',desc:'Floor finish including preparation, bedding and jointing'},
       ceiling:{unit:'m²',rate:1950,section:'Finishes',desc:'Ceiling'},
       paint_int:{unit:'m²',rate:380,section:'Finishes',desc:'Emulsion paint to internal walls and ceilings, two coats'},
       paint_ext:{unit:'m²',rate:450,section:'Finishes',desc:'External weather-resistant paint, two coats'},
@@ -2225,7 +2242,7 @@
       sprinkler:{unit:'m²',rate:1450,section:'Fire Protection',desc:'Sprinkler system (where applicable)'},
       extinguisher:{unit:'nr',rate:5500,section:'Fire Protection',desc:'Portable fire extinguishers'},
       // Roof & External
-      roof:{unit:'m²',rate:3200,section:'Roof',desc:'Roof covering complete including accessories'},
+      roof:{unit:'m²',rate:3200,section:'Roof',desc:'Roof covering complete including ridges, flashings and accessories'},
       external:{unit:'m²',rate:2200,section:'External',desc:'External concrete paving / walkways'},
       boundary:{unit:'m',rate:4500,section:'External',desc:'Boundary wall complete with columns and coping'},
       // Special
@@ -3260,11 +3277,17 @@
           prev.takeoff[el.id] = el.type === 'checkbox' ? el.checked : el.value;
         });
         prev.type = document.getElementById('projType')?.value || prev.type;
+        prev.foundation = document.getElementById('projFoundation')?.value || prev.foundation || 'strip';
+        if (prev.takeoff) prev.takeoff._foundation = prev.foundation;
       }
       projectBuildings.forEach(b => b.active = (b.id === id));
       const act = projectBuildings.find(b => b.id === id);
       if (act) {
         if (act.type && document.getElementById('projType')) document.getElementById('projType').value = act.type;
+        if (document.getElementById('projFoundation')) {
+          document.getElementById('projFoundation').value = act.foundation || act.takeoff?._foundation || 'strip';
+          if (typeof onFoundationTypeChange === 'function') onFoundationTypeChange();
+        }
         // Restore takeoff
         document.querySelectorAll('#tab-takeoff input[id^="to_"], #tab-takeoff select[id^="to_"]').forEach(el => {
           if (act.takeoff && act.takeoff[el.id] != null) {
@@ -3869,28 +3892,49 @@
     }
 
     
+    
+    function forceSetupCardsCollapsed() {
+      document.querySelectorAll('details.setup-card').forEach(d => { d.open = false; });
+    }
+    document.addEventListener('DOMContentLoaded', forceSetupCardsCollapsed);
+    window.addEventListener('load', forceSetupCardsCollapsed);
+
     function onFoundationTypeChange() {
       const fnd = document.getElementById('projFoundation')?.value || 'strip';
-      const el = document.getElementById('to_found_masonry');
-      if (el && fnd === 'trench_masonry' && !(parseFloat(el.value) > 0)) {
+      const panel = document.getElementById('trenchFoundPanel');
+      if (panel) panel.style.display = (fnd === 'trench_masonry') ? '' : 'none';
+      // Persist foundation type on active building
+      if (typeof projectBuildings !== 'undefined') {
+        const act = projectBuildings.find(b => b.active);
+        if (act) act.foundation = fnd;
+      }
+      if (fnd === 'trench_masonry') {
         const gfa = parseFloat(document.getElementById('projGFA')?.value) || 0;
+        const depthEl = document.getElementById('to_trench_depth');
+        if (depthEl && !(parseFloat(depthEl.value) > 0)) depthEl.value = 1500;
         if (gfa > 0) {
-          el.value = Math.round(gfa * 0.14);
+          const depthM = (parseFloat(depthEl?.value) || 1500) / 1000;
+          const peri = Math.max(12, Math.round(Math.sqrt(Math.max(gfa, 1)) * 4 * 10) / 10);
+          const setv = (id, v) => { const e = document.getElementById(id); if (e && !(parseFloat(e.value) > 0)) e.value = v; };
+          const trenchVol = Math.round(peri * 0.70 * depthM * 100) / 100;
+          const masonryVol = Math.round(peri * 0.40 * Math.max(0.6, depthM * 0.85) * 100) / 100;
+          setv('to_trench_excavation', trenchVol);
+          setv('to_found_masonry', masonryVol);
+          setv('to_lean_concrete', Math.round(peri * 0.55 * 0.05 * 100) / 100);
+          setv('to_backfill', Math.round(Math.max(0, trenchVol - masonryVol) * 0.55 * 100) / 100);
           const fc = document.getElementById('to_found_concrete');
-          if (fc) fc.value = Math.round(gfa * 0.02);
+          if (fc) fc.value = 0;
           const ex = document.getElementById('to_excavation');
-          if (ex && !(parseFloat(ex.value) > 0)) ex.value = Math.round(gfa * 0.22);
+          if (ex) ex.value = 0;
         }
       }
       if (typeof showToast === 'function') {
         const labels = {
           strip: 'Strip / isolated RC footings',
-          trench_masonry: 'Trench masonry foundation (no pad footings)',
-          mat: 'Mat / raft',
-          pile: 'Pile foundation',
-          basement: 'Basement'
+          trench_masonry: 'Trench masonry foundation — set depth & quantities (no pad RC)',
+          mat: 'Mat / raft', pile: 'Pile foundation', basement: 'Basement'
         };
-        showToast('Foundation: ' + (labels[fnd] || fnd) + ' — adjust takeoff or Auto-fill from GFA');
+        showToast('Foundation: ' + (labels[fnd] || fnd));
       }
     }
     function applyCitySiteDefaults() {
@@ -4764,6 +4808,8 @@
         const sec = document.getElementById('tab-' + btn.dataset.tab);
         if (sec) {
           if (sec.tagName === 'DETAILS') sec.open = true;
+          // Nested setup cards stay collapsed for a clear hierarchy
+          sec.querySelectorAll('details.setup-card').forEach(d => { d.open = false; });
           sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         if (btn.dataset.tab === 'summary') updateCharts();
@@ -5083,6 +5129,7 @@
       if (typeof projectBuildings !== 'undefined' && projectBuildings.length) {
         const prev = projectBuildings.find(b => b.active);
         if (prev) {
+          prev.foundation = document.getElementById('projFoundation')?.value || prev.foundation || 'strip';
           prev.takeoff = prev.takeoff || {};
           document.querySelectorAll('#tab-takeoff input[id^="to_"], #tab-takeoff select[id^="to_"]').forEach(el => {
             prev.takeoff[el.id] = el.type === 'checkbox' ? el.checked : el.value;
@@ -5117,7 +5164,7 @@
       };
       const waste = 1 + (parseFloat(document.getElementById('markupWaste').value)||0)/100;
       const map = [
-        ['to_excavation','excavation'],['to_found_concrete','found_concrete'],['to_found_masonry','masonry'],['to_hardcore','hardcore'],['to_dpc','dpc'],
+        ['to_excavation','excavation'],['to_trench_excavation','excavation_trench'],['to_found_concrete','found_concrete'],['to_lean_concrete','lean_concrete'],['to_found_masonry','masonry'],['to_backfill','backfill'],['to_hardcore','hardcore'],['to_dpc','dpc'],
         ['to_columns','columns'],['to_beams','beams'],['to_slabs','slabs'],['to_slabs_pt','slabs_pt'],['to_pt_tendon','pt_tendon'],['to_pt_anchor','pt_anchor'],['to_pt_grout','pt_grout'],['to_blockwork','blockwork'],['to_brickwork','brickwork'],['to_stone_masonry','stone_masonry'],['to_formwork','formwork'],['to_rebar','rebar'],
         ['to_plaster_int','plaster_int'],['to_plaster_ext','plaster_ext'],['to_flooring','flooring'],['to_ceiling','ceiling'],['to_paint_int','paint_int'],['to_paint_ext','paint_ext'],
         ['to_doors_ext','doors_ext'],['to_doors_int','doors_int'],['to_windows','windows'],
@@ -5201,6 +5248,23 @@
         if (!b) return;
         let specMult = 1;
         let specText = b.desc;
+        const fndNow = document.getElementById('projFoundation')?.value || 'strip';
+        if (key === 'found_concrete' && fndNow === 'trench_masonry') {
+          return; // no RC pads for trench masonry foundation
+        }
+        if (key === 'excavation_trench') {
+          const dmm = parseFloat(document.getElementById('to_trench_depth')?.value) || 1500;
+          specText = 'Excavation for foundation trench in ordinary soil to a depth of ' + dmm + ' mm from reduced ground level; dispose surplus off site';
+        }
+        if (key === 'masonry' && fndNow === 'trench_masonry') {
+          specText = 'Stone / block foundation masonry in trenches (below NGL), bedded in cement-sand mortar';
+        }
+        if (key === 'lean_concrete') {
+          specText = 'Lean concrete blinding under foundation masonry / strip walls';
+        }
+        if (key === 'backfill') {
+          specText = 'Selected granular backfill around foundation masonry, compacted in layers';
+        }
         if (key === 'doors_ext' && specs.doorExt) {
           specMult = specs.doorExt.mult;
           const ds = document.getElementById('specDoorExtSize')?.value || '';
@@ -5380,14 +5444,27 @@
         projectBuildings.forEach(b => {
           if (b.id === activeId || !b.takeoff) return;
           const prefix = '[' + (b.name || 'Building') + '] ';
+          const bFnd = b.foundation || (b.takeoff && b.takeoff._foundation) || 'strip';
           map.forEach(([id, key]) => {
             const qty = parseFloat(b.takeoff[id]) || 0;
             if (qty <= 0 || !BASE_RATES[key]) return;
+            if (key === 'found_concrete' && bFnd === 'trench_masonry') return;
+            if (key === 'excavation' && bFnd === 'trench_masonry' && (parseFloat(b.takeoff['to_trench_excavation'])||0) > 0) return;
             const base = BASE_RATES[key];
+            let desc = base.desc;
+            if (key === 'excavation_trench') {
+              const dmm = parseFloat(b.takeoff['to_trench_depth']) || 1500;
+              desc = 'Excavation for foundation trench in ordinary soil to a depth of ' + dmm + ' mm from reduced ground level; dispose surplus off site';
+            }
+            if (key === 'masonry' && bFnd === 'trench_masonry') {
+              desc = 'Stone / block foundation masonry in trenches (below NGL), bedded in cement-sand mortar';
+            }
+            if (key === 'lean_concrete') desc = 'Lean concrete blinding under foundation masonry / strip walls';
+            if (key === 'backfill') desc = 'Selected granular backfill around foundation masonry, compacted in layers';
             const rate = Math.round(base.rate * mult * soilMultForKey(key) * windMultForKey(key) * (['found_concrete','columns','beams','slabs'].includes(key) ? concMult : 1));
             boqItems.push({
               id: newRebarId(),
-              desc: prefix + base.desc,
+              desc: prefix + desc,
               unit: base.unit,
               qty: Math.round(qty * 100) / 100,
               rate,
@@ -5679,12 +5756,33 @@
       // Core structure — foundation quantities depend on foundation type
       const fnd = document.getElementById('projFoundation')?.value || 'strip';
       if (fnd === 'trench_masonry') {
-        // Warehouse / shed style: trench excavation + masonry strip, little/no pad footing concrete
-        set('to_excavation', Math.round(gfa*0.22));
-        set('to_found_concrete', Math.round(gfa*0.02)); // blinding / beam only if any
-        set('to_found_masonry', Math.round(gfa*0.14));
+        // G+0 store / warehouse / shed: trench excavation + masonry foundation (NO pad RC)
+        const depthMm = parseFloat(document.getElementById('to_trench_depth')?.value) || 1500;
+        const depthM = depthMm / 1000;
+        const peri = Math.max(12, Math.round(Math.sqrt(Math.max(gfa, 1)) * 4 * 10) / 10);
+        const trenchW = 0.70;
+        const trenchVol = Math.round(peri * trenchW * depthM * 100) / 100;
+        const masonryH = Math.max(0.6, depthM * 0.85);
+        const masonryVol = Math.round(peri * 0.40 * masonryH * 100) / 100;
+        const leanVol = Math.round(peri * 0.55 * 0.05 * 100) / 100;
+        const backfillVol = Math.round(Math.max(0, trenchVol - masonryVol) * 0.55 * 100) / 100;
+        set('to_trench_depth', depthMm);
+        set('to_trench_excavation', trenchVol);
+        set('to_excavation', 0);
+        set('to_found_concrete', 0); // no pad footings
+        set('to_lean_concrete', leanVol);
+        set('to_found_masonry', masonryVol);
+        set('to_backfill', backfillVol);
         set('to_hardcore', Math.round(gfa*0.12));
-        set('to_dpc', Math.round(gfa*0.20));
+        set('to_dpc', Math.round(gfa*0.22));
+        const fl = parseInt(document.getElementById('projFloors')?.value, 10) || 0;
+        if (fl <= 0) {
+          set('to_columns', 0);
+          set('to_beams', 0);
+          set('to_slabs', 0);
+          set('to_formwork', Math.round(gfa*0.12));
+          set('to_rebar', 0);
+        }
       } else if (fnd === 'mat') {
         set('to_excavation', Math.round(gfa*0.28));
         set('to_found_concrete', Math.round(gfa*0.22));
@@ -6390,9 +6488,15 @@
       const cleanDesc = (d) => {
         let s = String(d || '').replace(/\[[^\]]+\]\s*/g, '');
         s = s.replace(/MoM:\s*[^.;]+[.;]?\s*/gi, '');
-        s = s.replace(/\s{2,}/g, ' ').trim();
-        // Keep readable length but allow wrap in cell (no hard cut mid-sentence if short)
-        if (s.length > 220) s = s.slice(0, 217).trim() + '...';
+        // Drop rate-recipe / marketing add-ons for consultant-style BOQ lines
+        s = s.replace(/\s*[—–-]\s*Reinforced concrete foundations[^.;]*/gi, '');
+        s = s.replace(/Cement basis:[^.;]*/gi, '');
+        s = s.replace(/including formwork allowance in separate item[^.;]*/gi, '');
+        s = s.replace(/measured m[23] in situ\.?/gi, '');
+        s = s.replace(/\s{2,}/g, ' ').replace(/\s*;\s*;/g, ';').trim();
+        s = s.replace(/[;.,]\s*$/g, '');
+        // Ethiopian consultant BOQ: keep one clear sentence, wrap in cell
+        if (s.length > 140) s = s.slice(0, 137).trim() + '...';
         return s;
       };
       const safeSheet = (s) => {
