@@ -671,10 +671,11 @@
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-1 text-gray-600 dark:text-gray-400">Soil Bearing Capacity</label>
-                  <select id="projSoil" title="Ground condition for foundation defaults — independent of location cost factor" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                  <select id="projSoil" onchange="if(typeof onSoilChange==='function') onSoilChange()" title="Ground condition for foundation defaults — independent of location cost factor" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
                     <option value="good">Good (&gt;200 kPa) - Strip/Pad OK</option>
                     <option value="medium" selected>Medium (100-200 kPa)</option>
-                    <option value="poor">Poor (&lt;100 kPa) - Raft/Piles needed</option>
+                    <option value="poor">Poor (&lt;100 kPa) — consider raft/piles or treatment</option>
+                    <option value="poor_treated">Poor but treated / improved — pad or strip OK for G+0 to G+2</option>
                     <option value="very_poor">Very Poor / Expansive / Soft</option>
                   </select>
                   <p class="text-[10px] text-gray-500 mt-1.5 leading-relaxed">
@@ -858,10 +859,11 @@
                   <label class="block text-xs text-gray-500 mb-0.5">Method of measurement</label>
                   <select id="specSMM" class="w-full px-2.5 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
                     <option value="ecpn" selected>Ethiopian SMM (BaTCoDA / ECPN / CS-168)</option>
-                    <option value="mudhc">MUDHC Standard Methods of Measurement (2014/2015)</option>
-                    <option value="nrm2">NRM2 style (international reference)</option>
-                    <option value="smm7">SMM7 / similar</option>
-                    <option value="cesmm4">CESMM4 style</option>
+                    <option value="mudhc">MUDHC / MoUDC Standard Methods of Measurement (2014–updated practice)</option>
+                    <option value="nrm2">NRM2 (RICS — international reference)</option>
+                    <option value="cesmm4">CESMM4 (civil engineering)</option>
+                    <option value="pomi">POMI (Principles of Measurement International)</option>
+                    <option value="smm7">SMM7 / similar legacy</option>
                   </select>
                 </div>
                 <div>
@@ -938,16 +940,28 @@
                   </select>
                 </div>
                 <div>
-                  <label class="block text-xs text-gray-500 mb-0.5">Paint system</label>
-                  <select id="specPaint" class="w-full px-2.5 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                    <option value="emulsion">Emulsion (economy internal)</option>
-                    <option value="acrylic" selected>Acrylic emulsion (general)</option>
-                    <option value="weather">Weather-resistant external</option>
-                    <option value="silk">Silk / washable interior</option>
-                    <option value="epoxy_paint">Epoxy paint (wet / industrial / hospital)</option>
+                  <label class="block text-xs text-gray-500 mb-0.5">Internal surface finish</label>
+                  <select id="specPaintInt" class="w-full px-2.5 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                    <option value="emulsion">Emulsion (economy)</option>
+                    <option value="acrylic" selected>Acrylic emulsion</option>
+                    <option value="silk">Silk / washable</option>
+                    <option value="mineral">Mineral / silicate paint</option>
+                    <option value="enamel">Enamel / oil-based</option>
+                    <option value="epoxy_paint">Epoxy (wet / hospital)</option>
+                    <option value="ceramic_tile">Wall tiles / ceramic</option>
+                    <option value="texture_paint">Texture paint</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-500 mb-0.5">External surface finish</label>
+                  <select id="specPaintExt" class="w-full px-2.5 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                    <option value="weather" selected>Weather-resistant acrylic</option>
+                    <option value="mineral">Mineral / silicate paint</option>
+                    <option value="quartz">Quartz / textured coating</option>
+                    <option value="ceramic">Ceramic / acrylic texture</option>
+                    <option value="tile_cladding">Tile / ceramic cladding</option>
                     <option value="enamel">Enamel / oil-based</option>
                     <option value="texture_paint">Texture paint</option>
-                    <option value="fire_retardant">Fire-retardant paint</option>
                   </select>
                 </div>
                 <div>
@@ -977,10 +991,10 @@
                   <thead class="bg-slate-100 dark:bg-gray-800">
                     <tr>
                       <th class="px-2 py-1.5 text-left">Member</th>
-                      <th class="px-2 py-1.5">Nos</th>
+                      <th class="px-2 py-1.5" title="Members count, or slab panel width m">Nos / W</th>
                       <th class="px-2 py-1.5">Size (mm)</th>
-                      <th class="px-2 py-1.5">Length (m)</th>
-                      <th class="px-2 py-1.5">Main bars</th>
+                      <th class="px-2 py-1.5" title="Span (slab) or member length (m)">Span/L (m)</th>
+                      <th class="px-2 py-1.5" title="Main bar count; for slab = each bar length m (Bar L)">Mains / Bar L</th>
                       <th class="px-2 py-1.5">Ø main</th>
                       <th class="px-2 py-1.5">Main grade</th>
                       <th class="px-2 py-1.5">Stirrup grade</th>
@@ -1078,7 +1092,8 @@
                 <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-2">Mistaken add? Use <strong>✕</strong> on each row, <strong>Undo last slab helper</strong>, or <strong>Clear schedule</strong>. Edit numbers in the table anytime.</p>
               </div>
 
-              <p class="text-[11px] text-gray-500 mt-2">Total scheduled rebar: <strong id="rebarScheduleTotal">0</strong> kg (<span id="rebarScheduleTonne">0</span> t) — includes <strong>main bars + stirrups/links</strong> (from Ø, spacing and member size). Ethiopian practice: often S-300 for ≤Ø12, S-400 for &gt;Ø12; S-500 for high-strength — adjust grade per row. Columns, beams, strap beams, pads and combined footings use closed stirrups; piles use spiral/rings.</p>
+              <p class="text-[11px] text-gray-500 mt-2"><p class="text-[10px] text-slate-500 dark:text-slate-400 mb-1">Slab rows: <strong>Nos/W</strong> = panel width (m), <strong>Span/L</strong> = span (m), <strong>Mains/Bar L</strong> = length of each bar (m). For -ve bars use shorter Bar L (e.g. ~0.3×span). Estimated bar count shows next to the label.</p>
+              Total scheduled rebar: <strong id="rebarScheduleTotal">0</strong> kg (<span id="rebarScheduleTonne">0</span> t) — includes <strong>main bars + stirrups/links</strong> (from Ø, spacing and member size). Ethiopian practice: often S-300 for ≤Ø12, S-400 for &gt;Ø12; S-500 for high-strength — adjust grade per row. Columns, beams, strap beams, pads and combined footings use closed stirrups; piles use spiral/rings.</p>
               <div class="grid sm:grid-cols-3 gap-2 mt-3 text-sm">
                 <div>
                   <label class="block text-xs text-gray-500 mb-0.5">Cement type (ETB/50kg bag; 1 quintal = 2 bags)</label>
@@ -1975,6 +1990,10 @@
           <ol class="list-decimal list-inside space-y-1.5 text-gray-600 dark:text-gray-300">
             <li><strong>Use free</strong> — Setup, Takeoff, Rates, BOQ, Summary. Pay only when you <strong>Export Excel</strong>.</li>
             <li>Enter a clear <strong>Project Name</strong> (this name is what you pay for).</li>
+            <li><strong>Buildings first:</strong> add each block, set <strong>active</strong> building, then set GFA, floors and foundation for that building.</li>
+            <li><strong>Foundation:</strong> trench masonry for G+0 stores/warehouses; <strong>poor soil treated</strong> allows pad/strip on G+0–G+2 without forcing raft/piles.</li>
+            <li><strong>Finishes:</strong> choose internal and external surface systems separately (emulsion, mineral, quartz, ceramic, tiles…).</li>
+            <li><strong>Slab rebar:</strong> in the schedule table use Span, panel Width and Bar length — -ve bars use shorter bar length than +ve (not the same kg).</li>
             <li>Add floors as <strong>G+</strong> and basements; enter <strong>area per floor</strong> if sizes differ.</li>
             <li><strong>Several buildings in one project:</strong> under Setup use <strong>+ Add building / block</strong>. Switch the active building, fill its takeoff, then generate BOQ — all buildings combine under the same project name (one payment).</li>
             <li>Set <strong>concrete grades per member</strong> (e.g. slab C-25, columns C-30), rebar schedule, doors/windows/roof specs.</li>
@@ -2955,15 +2974,15 @@
       const defaults = {
         column: { type:'column', label:'Column', nos:4, size:'300x300', len:3.0, mainBars:8, mainDia:16, grade:'S-400', distDia:8, spacing:150 },
         beam: { type:'beam', label:'Beam', nos:10, size:'200x400', len:4.5, mainBars:4, mainDia:16, grade:'S-400', distDia:8, spacing:150 },
-        slab: { type:'slab', label:'Slab +ve bars', nos:1, size:'150 thk', len:20, mainBars:0, mainDia:10, grade:'S-300', distDia:8, spacing:150 },
+        slab: { type:'slab', label:'Slab +ve bars', nos:1, size:'150 thk', len:4.5, panelW:4.5, barLen:4.5, mainBars:0, mainDia:10, grade:'S-300', distDia:8, spacing:150 },
         pad: { type:'pad', label:'Pad footing', nos:4, size:'1500x1500x400', len:1.5, mainBars:8, mainDia:12, grade:'S-300', distDia:10, spacing:150 },
         raft: { type:'raft', label:'Raft/mat', nos:1, size:'300 thk', len:100, mainBars:0, mainDia:12, grade:'S-400', distDia:12, spacing:150 },
         pile: { type:'pile', label:'Bored pile', nos:8, size:'Ø400', len:12, mainBars:6, mainDia:16, grade:'S-400', distDia:8, spacing:200 },
         combined: { type:'combined', label:'Combined footing', nos:2, size:'2000x4000x500', len:4, mainBars:12, mainDia:16, grade:'S-400', distDia:12, spacing:150 },
         strap: { type:'strap', label:'Strap beam', nos:4, size:'250x400', len:5.0, mainBars:4, mainDia:16, grade:'S-400', distDia:8, spacing:150 },
         shear: { type:'shear', label:'Shear wall / lift core', nos:1, size:'200 thk', len:40, mainBars:0, mainDia:12, grade:'S-400', distDia:10, spacing:150 },
-        slab_neg: { type:'slab', label:'Slab -ve bars', nos:1, size:'150 thk', len:20, mainBars:0, mainDia:12, grade:'S-400', distDia:8, spacing:150 },
-        slab_dist: { type:'slab', label:'Slab distribution', nos:1, size:'150 thk', len:20, mainBars:0, mainDia:8, grade:'S-300', distDia:8, spacing:200 }
+        slab_neg: { type:'slab', label:'Slab -ve bars', nos:1, size:'150 thk', len:4.5, panelW:2.2, barLen:1.35, mainBars:0, mainDia:12, grade:'S-400', distDia:8, spacing:150 },
+        slab_dist: { type:'slab', label:'Slab distribution', nos:1, size:'150 thk', len:4.5, panelW:4.5, barLen:4.5, mainBars:0, mainDia:8, grade:'S-300', distDia:8, spacing:200 }
       };
       const actB = (typeof projectBuildings !== 'undefined') ? projectBuildings.find(b => b.active) : null;
       const row = Object.assign({
@@ -3068,11 +3087,36 @@
         // Individual bar runs from slab helper: nos = number of bars, len = length each (m)
         mainKg = nos * Math.max(1, mainBars) * len * (area/1000) * 7.85;
         distKg = 0;
-      } else if (r.type === 'slab' || r.type === 'raft' || r.type === 'shear') {
-        // mesh approx: len field = area m2 for slab/raft/shear
+      } else if (r.type === 'slab') {
+        // Engineering: panel width + bar length + spacing (not same for +ve / -ve / dist)
+        // len = span (m); panelW = width of panel strip (m); barLen = length of each bar (m)
+        const span = len > 0 ? len : 4;
+        const panelW = parseFloat(r.panelW) || parseFloat(r.nos) || span; // if nos was misused as count
+        const label = String(r.label || '');
+        const isNeg = /[-−–]\s*ve|negative|-ve/i.test(label);
+        const isDist = /dist/i.test(label);
+        // Default bar lengths: +ve ≈ span; -ve ≈ 0.3×span (over support); dist ≈ span
+        let barLen = parseFloat(r.barLen);
+        if (!(barLen > 0)) {
+          if (isNeg) barLen = Math.round(span * 0.30 * 100) / 100;
+          else if (isDist) barLen = span;
+          else barLen = span; // +ve
+        }
+        // Width for counting bars: -ve often over support strip (~0.25×span each side zone) unless panelW set
+        let widthForCount = parseFloat(r.panelW);
+        if (!(widthForCount > 0)) {
+          if (isNeg) widthForCount = Math.max(1, span * 0.5); // both support zones approx
+          else widthForCount = panelW > 0 && panelW !== span ? panelW : span;
+        }
+        const nBars = Math.max(1, Math.ceil((widthForCount * 1000) / spacingMm) + 1);
+        mainKg = nBars * barLen * (area / 1000) * 7.85;
+        distKg = 0;
+        r._nBarsEst = nBars;
+        r._barLenUsed = barLen;
+      } else if (r.type === 'raft' || r.type === 'shear') {
         const areaM2 = len;
         const barsPerM = 1000 / spacingMm;
-        mainKg = areaM2 * barsPerM * (area/1000) * 7.85 * 2; // two directions
+        mainKg = areaM2 * barsPerM * (area/1000) * 7.85 * 2;
         distKg = 0;
       } else if (r.type === 'pile') {
         mainKg = nos * mainBars * len * (area/1000) * 7.85;
@@ -3102,12 +3146,20 @@
       }
       tbody.innerHTML = rebarSchedule.map(r => {
         const kg = estimateRowKg(r);
+        const isSlab = r.type === 'slab';
+        const nosVal = isSlab ? (r.panelW != null ? r.panelW : r.nos) : r.nos;
+        const nosField = isSlab ? 'panelW' : 'nos';
+        const midVal = isSlab ? (r.barLen != null ? r.barLen : (r.len || 0)) : r.mainBars;
+        const midField = isSlab ? 'barLen' : 'mainBars';
+        const midTitle = isSlab ? 'Each bar length (m) — -ve bars shorter than span' : 'Number of main bars';
+        const lenTitle = isSlab ? 'Slab span (m)' : (r.type==='raft' ? 'Area m²' : 'Member length m');
+        const nHint = isSlab && r._nBarsEst ? ` <span class="text-[9px] text-gray-400" title="Bars from width÷spacing">≈${r._nBarsEst} bars</span>` : '';
         return `<tr class="border-b border-slate-100 dark:border-gray-800">
-          <td class="px-1 py-1"><span class="font-medium text-slate-800 dark:text-slate-100">${r.label||r.type}</span> <button type="button" onclick="removeRebarRow('${r.id}')" class="text-red-500 dark:text-red-400 ml-1 font-bold" title="Remove this row">✕</button></td>
-          <td class="px-1 py-1"><input type="number" data-rid="${r.id}" data-f="nos" value="${r.nos}" class="w-14 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs text-right"></td>
+          <td class="px-1 py-1"><span class="font-medium text-slate-800 dark:text-slate-100">${r.label||r.type}</span>${nHint} <button type="button" onclick="removeRebarRow('${r.id}')" class="text-red-500 dark:text-red-400 ml-1 font-bold" title="Remove this row">✕</button></td>
+          <td class="px-1 py-1"><input type="number" step="0.1" data-rid="${r.id}" data-f="${nosField}" value="${nosVal}" class="w-14 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs text-right" title="${isSlab?'Panel / strip width (m)':'Number of members'}"></td>
           <td class="px-1 py-1"><input type="text" data-rid="${r.id}" data-f="size" value="${r.size||''}" class="w-24 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs"></td>
-          <td class="px-1 py-1"><input type="number" step="0.1" data-rid="${r.id}" data-f="len" value="${r.len}" class="w-16 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs text-right" title="${r.type==='slab'||r.type==='raft'?'Area m² for slab/raft':'Length m'}"></td>
-          <td class="px-1 py-1"><input type="number" data-rid="${r.id}" data-f="mainBars" value="${r.mainBars}" class="w-14 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs text-right"></td>
+          <td class="px-1 py-1"><input type="number" step="0.1" data-rid="${r.id}" data-f="len" value="${r.len}" class="w-16 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs text-right" title="${lenTitle}"></td>
+          <td class="px-1 py-1"><input type="number" step="0.05" data-rid="${r.id}" data-f="${midField}" value="${midVal}" class="w-14 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs text-right" title="${midTitle}"></td>
           <td class="px-1 py-1"><select data-rid="${r.id}" data-f="mainDia" class="w-16 px-0.5 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs">${[8,10,12,14,16,20,25].map(d=>`<option value="${d}" ${d==r.mainDia?'selected':''}>${d}</option>`).join('')}</select></td>
           <td class="px-1 py-1"><select data-rid="${r.id}" data-f="grade" title="Main bar grade" class="w-20 px-0.5 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs"><option value="S-300" ${r.grade==='S-300'?'selected':''}>S-300</option><option value="S-400" ${r.grade==='S-400'?'selected':''}>S-400</option><option value="S-500" ${r.grade==='S-500'?'selected':''}>S-500</option></select></td>
           <td class="px-1 py-1"><select data-rid="${r.id}" data-f="stirrupGrade" title="Stirrup/link grade" class="w-20 px-0.5 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs"><option value="S-300" ${(r.stirrupGrade||'S-300')==='S-300'?'selected':''}>S-300</option><option value="S-400" ${(r.stirrupGrade||'')==='S-400'?'selected':''}>S-400</option><option value="S-500" ${(r.stirrupGrade||'')==='S-500'?'selected':''}>S-500</option></select></td>
@@ -3133,7 +3185,7 @@
       const row = rebarSchedule.find(r => String(r.id) === id);
       if (!row) return;
       let v = e.target.value;
-      if (['nos','len','mainBars','mainDia','distDia','spacing'].includes(f)) {
+      if (['nos','len','mainBars','mainDia','distDia','spacing','panelW','barLen'].includes(f)) {
         // Allow empty while typing; only coerce when field has a complete number or on blur
         if (v === '' || v === '-' || v === '.') {
           // keep typing
@@ -3899,6 +3951,28 @@
     document.addEventListener('DOMContentLoaded', forceSetupCardsCollapsed);
     window.addEventListener('load', forceSetupCardsCollapsed);
 
+    
+    function onSoilChange() {
+      const soil = document.getElementById('projSoil')?.value || 'medium';
+      const floors = parseInt(document.getElementById('projFloors')?.value, 10) || 0;
+      const fndEl = document.getElementById('projFoundation');
+      if (!fndEl) return;
+      // Small buildings on treated poor soil can use pad/strip (cost-effective vs raft/pile)
+      if (soil === 'poor_treated' && floors <= 2) {
+        if (fndEl.value === 'mat' || fndEl.value === 'pile') {
+          fndEl.value = 'strip';
+          if (typeof onFoundationTypeChange === 'function') onFoundationTypeChange();
+          if (typeof showToast === 'function') showToast('Treated soil + G+' + floors + ': pad/strip foundation suggested (raft/pile optional)');
+        }
+      } else if (soil === 'poor' && floors >= 3 && fndEl.value === 'strip') {
+        if (typeof showToast === 'function') showToast('Poor soil on taller building: consider raft, piles, or soil treatment');
+      } else if (soil === 'very_poor' && (fndEl.value === 'strip' || fndEl.value === 'trench_masonry')) {
+        if (typeof showToast === 'function') showToast('Very poor soil: raft, piles, or engineered treatment recommended');
+      } else if (soil === 'poor_treated') {
+        if (typeof showToast === 'function') showToast('Soil treated — pad/strip suitable for G+0 to G+2; check geotech report');
+      }
+    }
+
     function onFoundationTypeChange() {
       const fnd = document.getElementById('projFoundation')?.value || 'strip';
       const panel = document.getElementById('trenchFoundPanel');
@@ -4625,17 +4699,14 @@
     }
     
     const WIZARD_STEPS = [
-      { title: 'Welcome to EthioBuild', body: 'Professional construction cost estimating — takeoff, rates, BOQ and Excel export. Explore free; pay only when you Export. If your project has more than one building or block, the next steps show exactly how to handle that.', tab: 'setup' },
-      { title: '1. One project name', body: 'In Setup, type a clear Project Name (e.g. “Bole Mixed Development”). You pay once for this name. All buildings under this name share that one payment after unlock.', tab: 'setup' },
-      { title: '2. Do you have other buildings?', body: 'Same site, several structures? Examples: Block A apartments + Block B shops, or Main hospital + Clinic + Generator house. You do NOT create a new project for each — you add buildings inside this project.', tab: 'setup' },
-      { title: '3. Add each building / block', body: 'In Setup find “Buildings in this project”. Click “+ Add building / block”. Rename (e.g. “Block A”, “Warehouse”, “Clinic”). Add as many as you need. Keep at least one building.', tab: 'setup' },
-      { title: '4. Work on the ACTIVE building', body: 'Tap a building so it shows as active. Everything you enter next (floors, areas, takeoff) applies to THAT building only. Switch active building anytime — each keeps its own quantities.', tab: 'setup' },
-      { title: '5. Floors, areas & concrete grades', body: 'For the active building: set G+ and basements, floor areas, concrete grades (slab may be C-25 while columns are C-30), and optional rebar schedule. Then switch to the next building and repeat.', tab: 'setup' },
-      { title: '6. Specs for this building', body: 'Set doors, windows, roof, electrical, sanitary, lifts for the type of building you are on (hospital vs warehouse vs apartment can differ). Then make another building active if needed and adjust specs when you take off that building.', tab: 'setup' },
-      { title: '7. Takeoff per building', body: 'Open Takeoff. With Building A active, Auto-fill or enter quantities for A. Switch to Building B (Setup list), return to Takeoff, enter B’s quantities. Hospital rooms, site works, generators, etc. can sit on the building they belong to.', tab: 'takeoff' },
-      { title: '8. Rates (optional)', body: 'Rates are shared for the whole project. Edit cement, rebar, labour, machinery if you want, then Rebuild rates. This updates unit rates for all buildings.', tab: 'rates' },
-      { title: '9. One BOQ for all buildings', body: 'Click Generate BOQ once. EthioBuild merges every building. Lines from other buildings are tagged [Building name]. Summary → Cost by building shows the split. Still one project name.', tab: 'boq' },
-      { title: '10. Export the whole project', body: 'Export → Professional Excel includes all buildings under your project name. Pay once for that name; later exports of the same name stay unlocked. Demo code: DEMO2026.', tab: 'export' }
+      { title: 'Welcome to EthioBuild', body: 'Ethiopian consultant-style estimating: multi-building projects, takeoff, rates, BOQ and professional Excel. Explore free — pay only when you Export.', tab: 'setup' },
+      { title: '1. Buildings first', body: 'Open Project Setup → Buildings in this project. Add each block (e.g. Main house, Store). Set the ACTIVE building — all takeoff applies to that building only.', tab: 'setup' },
+      { title: '2. Project info for active building', body: 'Set type, GFA, floors, foundation. G+0 store/warehouse can use Trench masonry (no pad). Poor soil can be marked “treated” so pad/strip stays viable for G+0–G+2.', tab: 'setup' },
+      { title: '3. Specs & finishes', body: 'Detailed specifications: doors, windows, and separate internal / external surface finishes (emulsion, mineral, quartz, ceramic, tiles…). Each building can differ.', tab: 'setup' },
+      { title: '4. Rebar schedule', body: 'Add columns, beams, slabs. For slab +ve / -ve / distribution: enter Span, panel Width, and Bar length (m). -ve bars are shorter than span — kg updates from real lengths and spacing.', tab: 'setup' },
+      { title: '5. Takeoff', body: 'Auto-fill from GFA or type quantities. Optional systems (lifts, HVAC) stay at 0 unless needed. Trench foundation fills trench excavation, masonry, lean concrete and backfill.', tab: 'takeoff' },
+      { title: '6. Generate BOQ', body: 'One Generate builds all buildings into one BOQ (tagged per building). Undo last Generate if you clicked by mistake. Summary and Excel use separate sheets per building.', tab: 'boq' },
+      { title: '7. Export Excel', body: 'Professional Excel: Cover, Summary, per-building BOQ / Takeoff / Rebar, Rates, Certification. Ethiopian style: BILL NO., TOTAL CARRIED TO SUMMARY.', tab: 'export' }
     ];
     let wizardStep = 0;
     function startWizard() {
@@ -5306,12 +5377,27 @@
           specText = specs.window.text + (ws ? ' Size ' + ws + ' mm.' : '') + ' Glass: ' + glass + '.';
         }
         else if (key === 'paint_int' || key === 'paint_ext') {
-          const pt = document.getElementById('specPaint')?.value || 'acrylic';
-          const pM = { emulsion:0.9, acrylic:1, weather:1.15, silk:1.12, epoxy_paint:1.35, enamel:1.2, texture_paint:1.25, fire_retardant:1.4 }[pt] || 1;
-          // External weather default boost if weather selected
-          if (key === 'paint_ext' && pt === 'acrylic') specMult = 1.05 * pM;
-          else specMult = pM;
-          specText = (b.desc || 'Paint') + ' — system: ' + pt.replace(/_/g,' ') + '. Measured m².';
+          const isExt = key === 'paint_ext';
+          const pt = isExt
+            ? (document.getElementById('specPaintExt')?.value || document.getElementById('specPaint')?.value || 'weather')
+            : (document.getElementById('specPaintInt')?.value || document.getElementById('specPaint')?.value || 'acrylic');
+          const pM = {
+            emulsion:0.88, acrylic:1, weather:1.12, silk:1.12, mineral:1.18, quartz:1.35,
+            ceramic:1.4, ceramic_tile:1.85, tile_cladding:2.1, epoxy_paint:1.4, enamel:1.22,
+            texture_paint:1.28, fire_retardant:1.4
+          }[pt] || 1;
+          // Prefer specialized rate keys when selected
+          if (!isExt && pt === 'ceramic_tile' && BASE_RATES.cladding_tile) { /* wall tiles use cladding rate scale */ }
+          if (isExt && (pt === 'tile_cladding' || pt === 'ceramic') && BASE_RATES.cladding_tile) {
+            const ct = BASE_RATES.cladding_tile;
+            b = Object.assign({}, b, { rate: ct.rate, desc: ct.desc });
+          }
+          if (isExt && pt === 'quartz' && BASE_RATES.paint_quartz) b = Object.assign({}, b, { rate: BASE_RATES.paint_quartz.rate, desc: BASE_RATES.paint_quartz.desc });
+          if (isExt && pt === 'mineral' && BASE_RATES.paint_mineral) b = Object.assign({}, b, { rate: BASE_RATES.paint_mineral.rate, desc: BASE_RATES.paint_mineral.desc });
+          if (!isExt && pt === 'mineral' && BASE_RATES.paint_mineral) b = Object.assign({}, b, { rate: BASE_RATES.paint_mineral.rate, desc: BASE_RATES.paint_mineral.desc });
+          specMult = pM;
+          const side = isExt ? 'External' : 'Internal';
+          specText = (b.desc || (side + ' finish')) + ' — ' + side.toLowerCase() + ' system: ' + pt.replace(/_/g,' ');
         }
         else if (key === 'plaster_int') {
           const pl = document.getElementById('specPlasterInt')?.value || 'double';
