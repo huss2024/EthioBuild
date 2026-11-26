@@ -991,10 +991,10 @@
                   <thead class="bg-slate-100 dark:bg-gray-800">
                     <tr>
                       <th class="px-2 py-1.5 text-left">Member</th>
-                      <th class="px-2 py-1.5" title="Columns/beams: how many members. Slab: panel width in metres">Nos or Width</th>
+                      <th class="px-2 py-1.5" title="How many members — or for slab: width of panel (m)">Count</th>
                       <th class="px-2 py-1.5">Size (mm)</th>
-                      <th class="px-2 py-1.5" title="Columns/beams: member length. Slab: span in metres">Length or Span</th>
-                      <th class="px-2 py-1.5" title="Columns/beams: number of main bars. Slab: length of each bar in metres">Main bars or Bar length</th>
+                      <th class="px-2 py-1.5" title="Member length (m) — or for slab: span (m)">Length (m)</th>
+                      <th class="px-2 py-1.5" title="Number of main bars — or for slab: length of each bar (m)">Bars</th>
                       <th class="px-2 py-1.5">Ø main</th>
                       <th class="px-2 py-1.5">Main grade</th>
                       <th class="px-2 py-1.5">Stirrup grade</th>
@@ -1092,10 +1092,56 @@
                 <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-2">Mistaken add? Use <strong>✕</strong> on each row, <strong>Undo last slab helper</strong>, or <strong>Clear schedule</strong>. Edit numbers in the table anytime.</p>
               </div>
 
-              <p class="text-[11px] text-gray-500 mt-2"><p class="text-[11px] text-slate-600 dark:text-slate-300 mb-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><strong>How to fill this table</strong><br>
-              • <strong>Column / beam / footing:</strong> Nos = how many members · Length = length of each (m) · Main bars = bars in the section<br>
-              • <strong>Slab +ve / −ve / distribution:</strong> Width = panel width (m) · Span = clear span (m) · Bar length = length of each bar (m)<br>
-              • <strong>Slab −ve bars</strong> are shorter than the span (often about 0.25–0.35 × span). +ve bars are usually near full span. Spacing sets how many bars fit across the width.</p>
+              <p class="text-[11px] text-gray-500 mt-2"><div class="mb-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-[11px] text-slate-700 dark:text-slate-200">
+                <p class="font-semibold text-slate-800 dark:text-slate-100 mb-2">How to fill · simple pictures</p>
+                <div class="grid sm:grid-cols-3 gap-2 mb-2">
+                  <!-- Column / beam -->
+                  <div class="rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 p-2">
+                    <p class="font-medium mb-1 text-center">Column / beam / footing</p>
+                    <svg viewBox="0 0 160 70" class="w-full h-16" aria-hidden="true">
+                      <rect x="55" y="8" width="22" height="54" rx="2" fill="#94a3b8" stroke="#334155" stroke-width="1.5"/>
+                      <line x1="60" y1="12" x2="60" y2="58" stroke="#1e40af" stroke-width="2"/>
+                      <line x1="66" y1="12" x2="66" y2="58" stroke="#1e40af" stroke-width="2"/>
+                      <line x1="72" y1="12" x2="72" y2="58" stroke="#1e40af" stroke-width="2"/>
+                      <path d="M48 20 h-12 M48 35 h-12 M48 50 h-12" stroke="#64748b" stroke-width="1" marker-end=""/>
+                      <text x="8" y="38" fill="#475569" font-size="8">Count= how many</text>
+                      <text x="95" y="28" fill="#475569" font-size="8">Length = height</text>
+                      <text x="95" y="42" fill="#1e40af" font-size="8">Bars = in section</text>
+                    </svg>
+                    <p class="text-[10px] text-center text-slate-500 mt-0.5">Count · Length · Bars</p>
+                  </div>
+                  <!-- Slab +ve -->
+                  <div class="rounded-lg bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800 p-2">
+                    <p class="font-medium mb-1 text-center text-emerald-800 dark:text-emerald-300">Slab +ve bars</p>
+                    <svg viewBox="0 0 160 70" class="w-full h-16" aria-hidden="true">
+                      <rect x="20" y="22" width="120" height="28" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+                      <line x1="28" y1="28" x2="132" y2="28" stroke="#047857" stroke-width="1.5"/>
+                      <line x1="28" y1="36" x2="132" y2="36" stroke="#047857" stroke-width="1.5"/>
+                      <line x1="28" y1="44" x2="132" y2="44" stroke="#047857" stroke-width="1.5"/>
+                      <text x="55" y="16" fill="#047857" font-size="8">← span →</text>
+                      <text x="2" y="40" fill="#64748b" font-size="7" transform="rotate(-90 8 40)">width</text>
+                      <text x="40" y="64" fill="#047857" font-size="8">Bar length ≈ full span</text>
+                    </svg>
+                    <p class="text-[10px] text-center text-slate-500 mt-0.5">Width · Span · Bar length ≈ span</p>
+                  </div>
+                  <!-- Slab -ve -->
+                  <div class="rounded-lg bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 p-2">
+                    <p class="font-medium mb-1 text-center text-amber-800 dark:text-amber-300">Slab −ve bars</p>
+                    <svg viewBox="0 0 160 70" class="w-full h-16" aria-hidden="true">
+                      <rect x="20" y="22" width="120" height="28" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+                      <line x1="22" y1="30" x2="55" y2="30" stroke="#b45309" stroke-width="2"/>
+                      <line x1="22" y1="38" x2="55" y2="38" stroke="#b45309" stroke-width="2"/>
+                      <line x1="105" y1="30" x2="138" y2="30" stroke="#b45309" stroke-width="2"/>
+                      <line x1="105" y1="38" x2="138" y2="38" stroke="#b45309" stroke-width="2"/>
+                      <text x="24" y="16" fill="#b45309" font-size="8">short bars at supports</text>
+                      <text x="35" y="64" fill="#b45309" font-size="8">Bar length ≈ 0.3 × span</text>
+                    </svg>
+                    <p class="text-[10px] text-center text-slate-500 mt-0.5">Width · Span · Bar length shorter</p>
+                  </div>
+                </div>
+                <p class="text-[10px] text-slate-500 dark:text-slate-400">Same three columns for everything. For <strong>slab</strong> rows only: Count = panel width (m), Length = span (m), Bars = length of each bar (m). Spacing controls how many bars fit across the width.</p>
+              </div>
+              
               Total scheduled rebar: <strong id="rebarScheduleTotal">0</strong> kg (<span id="rebarScheduleTonne">0</span> t) — includes <strong>main bars + stirrups/links</strong> (from Ø, spacing and member size). Ethiopian practice: often S-300 for ≤Ø12, S-400 for &gt;Ø12; S-500 for high-strength — adjust grade per row. Columns, beams, strap beams, pads and combined footings use closed stirrups; piles use spiral/rings.</p>
               <div class="grid sm:grid-cols-3 gap-2 mt-3 text-sm">
                 <div>
