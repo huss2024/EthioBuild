@@ -1093,12 +1093,12 @@
               </div>
 
               <p class="text-[11px] text-gray-500 mt-2"><div class="mb-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-[11px] text-slate-700 dark:text-slate-200">
-                <p class="font-semibold text-slate-800 dark:text-slate-100 mb-2">How to fill · simple pictures</p>
+                <p class="font-semibold text-slate-800 dark:text-slate-100 mb-2">How to fill · simple pictures <span class="font-normal text-slate-500">(click a picture to enlarge)</span></p>
                 <div class="grid sm:grid-cols-3 gap-2 mb-2">
                   <!-- Column / beam -->
-                  <div class="rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 p-2">
+                  <div role="button" tabindex="0" onclick="enlargeRebarDiagram(this)" onkeydown="if(event.key==='Enter')enlargeRebarDiagram(this)" class="rebar-diagram-card cursor-pointer rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 p-2 hover:ring-2 hover:ring-blue-400 transition" title="Click to enlarge">
                     <p class="font-medium mb-1 text-center">Column / beam / footing</p>
-                    <svg viewBox="0 0 160 70" class="w-full h-16" aria-hidden="true">
+                    <svg viewBox="0 0 160 70" class="w-full h-20 sm:h-24" aria-hidden="true">
                       <rect x="55" y="8" width="22" height="54" rx="2" fill="#94a3b8" stroke="#334155" stroke-width="1.5"/>
                       <line x1="60" y1="12" x2="60" y2="58" stroke="#1e40af" stroke-width="2"/>
                       <line x1="66" y1="12" x2="66" y2="58" stroke="#1e40af" stroke-width="2"/>
@@ -1111,9 +1111,9 @@
                     <p class="text-[10px] text-center text-slate-500 mt-0.5">Count · Length · Bars</p>
                   </div>
                   <!-- Slab +ve -->
-                  <div class="rounded-lg bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800 p-2">
+                  <div role="button" tabindex="0" onclick="enlargeRebarDiagram(this)" onkeydown="if(event.key==='Enter')enlargeRebarDiagram(this)" class="rebar-diagram-card cursor-pointer rounded-lg bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800 p-2 hover:ring-2 hover:ring-emerald-400 transition" title="Click to enlarge">
                     <p class="font-medium mb-1 text-center text-emerald-800 dark:text-emerald-300">Slab +ve bars</p>
-                    <svg viewBox="0 0 160 70" class="w-full h-16" aria-hidden="true">
+                    <svg viewBox="0 0 160 70" class="w-full h-20 sm:h-24" aria-hidden="true">
                       <rect x="20" y="22" width="120" height="28" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
                       <line x1="28" y1="28" x2="132" y2="28" stroke="#047857" stroke-width="1.5"/>
                       <line x1="28" y1="36" x2="132" y2="36" stroke="#047857" stroke-width="1.5"/>
@@ -1125,9 +1125,9 @@
                     <p class="text-[10px] text-center text-slate-500 mt-0.5">Width · Span · Bar length ≈ span</p>
                   </div>
                   <!-- Slab -ve -->
-                  <div class="rounded-lg bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 p-2">
+                  <div role="button" tabindex="0" onclick="enlargeRebarDiagram(this)" onkeydown="if(event.key==='Enter')enlargeRebarDiagram(this)" class="rebar-diagram-card cursor-pointer rounded-lg bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 p-2 hover:ring-2 hover:ring-amber-400 transition" title="Click to enlarge">
                     <p class="font-medium mb-1 text-center text-amber-800 dark:text-amber-300">Slab −ve bars</p>
-                    <svg viewBox="0 0 160 70" class="w-full h-16" aria-hidden="true">
+                    <svg viewBox="0 0 160 70" class="w-full h-20 sm:h-24" aria-hidden="true">
                       <rect x="20" y="22" width="120" height="28" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
                       <line x1="22" y1="30" x2="55" y2="30" stroke="#b45309" stroke-width="2"/>
                       <line x1="22" y1="38" x2="55" y2="38" stroke="#b45309" stroke-width="2"/>
@@ -3994,6 +3994,47 @@
 
     
     
+    
+    function enlargeRebarDiagram(card) {
+      if (!card) return;
+      const modal = document.getElementById('rebarDiagramModal');
+      const titleEl = document.getElementById('rebarDiagramModalTitle');
+      const body = document.getElementById('rebarDiagramModalBody');
+      if (!modal || !body) return;
+      const title = card.querySelector('p')?.textContent || 'Diagram';
+      const svg = card.querySelector('svg');
+      if (titleEl) titleEl.textContent = title;
+      body.innerHTML = '';
+      if (svg) {
+        const clone = svg.cloneNode(true);
+        clone.removeAttribute('class');
+        clone.setAttribute('class', 'w-full max-w-2xl');
+        clone.style.height = 'min(70vh, 420px)';
+        clone.style.width = '100%';
+        body.appendChild(clone);
+      }
+      const cap = card.querySelectorAll('p');
+      if (cap.length > 1) {
+        const note = document.createElement('p');
+        note.className = 'text-sm text-center text-slate-600 dark:text-slate-300 mt-3';
+        note.textContent = cap[cap.length - 1].textContent || '';
+        body.appendChild(note);
+      }
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeRebarDiagram() {
+      const modal = document.getElementById('rebarDiagramModal');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeRebarDiagram();
+    });
+
     function forceSetupCardsCollapsed() {
       document.querySelectorAll('details.setup-card').forEach(d => { d.open = false; });
     }
@@ -7269,6 +7310,17 @@
         <button type="button" onclick="ebCalcCopy()" class="w-full py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium">Copy result</button>
       </div>
     </div>
+
+
+  <!-- Rebar diagram enlarge -->
+  <div id="rebarDiagramModal" class="fixed inset-0 z-[200000] hidden items-center justify-center p-3 sm:p-6 bg-black/70" onclick="if(event.target===this)closeRebarDiagram()">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[92vh] overflow-auto p-4 sm:p-6 border border-gray-200 dark:border-gray-700 relative" onclick="event.stopPropagation()">
+      <button type="button" onclick="closeRebarDiagram()" class="absolute top-3 right-3 w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xl leading-none" title="Close">×</button>
+      <div id="rebarDiagramModalTitle" class="font-semibold text-base sm:text-lg text-slate-800 dark:text-slate-100 mb-3 pr-10"></div>
+      <div id="rebarDiagramModalBody" class="w-full flex justify-center items-center min-h-[200px]"></div>
+      <p class="text-xs text-center text-gray-500 mt-3">Tap outside or × to close</p>
+    </div>
+  </div>
 
 </body>
 </html>
