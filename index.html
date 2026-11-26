@@ -1093,54 +1093,100 @@
               </div>
 
               <p class="text-[11px] text-gray-500 mt-2"><div class="mb-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-[11px] text-slate-700 dark:text-slate-200">
-                <p class="font-semibold text-slate-800 dark:text-slate-100 mb-2">How to fill · simple pictures <span class="font-normal text-slate-500">(click a picture to enlarge)</span></p>
-                <div class="grid sm:grid-cols-3 gap-2 mb-2">
-                  <!-- Column / beam -->
-                  <div role="button" tabindex="0" onclick="enlargeRebarDiagram(this)" onkeydown="if(event.key==='Enter')enlargeRebarDiagram(this)" class="rebar-diagram-card cursor-pointer rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 p-2 hover:ring-2 hover:ring-blue-400 transition" title="Click to enlarge">
-                    <p class="font-medium mb-1 text-center">Column / beam / footing</p>
-                    <svg viewBox="0 0 160 70" class="w-full h-20 sm:h-24" aria-hidden="true">
-                      <rect x="55" y="8" width="22" height="54" rx="2" fill="#94a3b8" stroke="#334155" stroke-width="1.5"/>
-                      <line x1="60" y1="12" x2="60" y2="58" stroke="#1e40af" stroke-width="2"/>
-                      <line x1="66" y1="12" x2="66" y2="58" stroke="#1e40af" stroke-width="2"/>
-                      <line x1="72" y1="12" x2="72" y2="58" stroke="#1e40af" stroke-width="2"/>
-                      <path d="M48 20 h-12 M48 35 h-12 M48 50 h-12" stroke="#64748b" stroke-width="1" marker-end=""/>
-                      <text x="8" y="38" fill="#475569" font-size="8">Count= how many</text>
-                      <text x="95" y="28" fill="#475569" font-size="8">Length = height</text>
-                      <text x="95" y="42" fill="#1e40af" font-size="8">Bars = in section</text>
-                    </svg>
-                    <p class="text-[10px] text-center text-slate-500 mt-0.5">Count · Length · Bars</p>
-                  </div>
-                  <!-- Slab +ve -->
+                <p class="font-semibold text-slate-800 dark:text-slate-100 mb-1">Slab steel — correct layout <span class="font-normal text-slate-500">(click a picture to enlarge)</span></p>
+                <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-2">One-way slab: long/short ≥ 2 → main +ve along the <strong>short</strong> span. Two-way: ratio &lt; 2 → main +ve in <strong>both</strong> directions. −ve bars sit over supports and are shorter.</p>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 mb-2">
+                  <!-- One-way +ve -->
                   <div role="button" tabindex="0" onclick="enlargeRebarDiagram(this)" onkeydown="if(event.key==='Enter')enlargeRebarDiagram(this)" class="rebar-diagram-card cursor-pointer rounded-lg bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800 p-2 hover:ring-2 hover:ring-emerald-400 transition" title="Click to enlarge">
-                    <p class="font-medium mb-1 text-center text-emerald-800 dark:text-emerald-300">Slab +ve bars</p>
-                    <svg viewBox="0 0 160 70" class="w-full h-20 sm:h-24" aria-hidden="true">
-                      <rect x="20" y="22" width="120" height="28" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
-                      <line x1="28" y1="28" x2="132" y2="28" stroke="#047857" stroke-width="1.5"/>
-                      <line x1="28" y1="36" x2="132" y2="36" stroke="#047857" stroke-width="1.5"/>
-                      <line x1="28" y1="44" x2="132" y2="44" stroke="#047857" stroke-width="1.5"/>
-                      <text x="55" y="16" fill="#047857" font-size="8">← span →</text>
-                      <text x="2" y="40" fill="#64748b" font-size="7" transform="rotate(-90 8 40)">width</text>
-                      <text x="40" y="64" fill="#047857" font-size="8">Bar length ≈ full span</text>
+                    <p class="font-medium mb-1 text-center text-emerald-800 dark:text-emerald-300 text-[11px]">One-way slab · +ve (main)</p>
+                    <svg viewBox="0 0 180 100" class="w-full h-24 sm:h-28" xmlns="http://www.w3.org/2000/svg">
+                      <!-- plan: long horizontal, short vertical -->
+                      <rect x="30" y="18" width="130" height="55" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+                      <!-- beams -->
+                      <rect x="30" y="18" width="130" height="5" fill="#64748b"/>
+                      <rect x="30" y="68" width="130" height="5" fill="#64748b"/>
+                      <rect x="30" y="18" width="5" height="55" fill="#64748b"/>
+                      <rect x="155" y="18" width="5" height="55" fill="#64748b"/>
+                      <!-- main +ve along SHORT span (vertical lines = bars running top-bottom) -->
+                      <line x1="50" y1="24" x2="50" y2="67" stroke="#047857" stroke-width="2"/>
+                      <line x1="70" y1="24" x2="70" y2="67" stroke="#047857" stroke-width="2"/>
+                      <line x1="90" y1="24" x2="90" y2="67" stroke="#047857" stroke-width="2"/>
+                      <line x1="110" y1="24" x2="110" y2="67" stroke="#047857" stroke-width="2"/>
+                      <line x1="130" y1="24" x2="130" y2="67" stroke="#047857" stroke-width="2"/>
+                      <text x="55" y="12" fill="#047857" font-size="8" font-weight="bold">Main +ve → short span</text>
+                      <text x="5" y="50" fill="#64748b" font-size="7">short</text>
+                      <text x="70" y="90" fill="#64748b" font-size="8">long side (width for count)</text>
+                      <text x="35" y="98" fill="#047857" font-size="7">Bar length ≈ short span · Count across long side</text>
                     </svg>
-                    <p class="text-[10px] text-center text-slate-500 mt-0.5">Width · Span · Bar length ≈ span</p>
+                    <p class="text-[10px] text-center text-slate-500 mt-0.5">Main bars // short span</p>
                   </div>
-                  <!-- Slab -ve -->
-                  <div role="button" tabindex="0" onclick="enlargeRebarDiagram(this)" onkeydown="if(event.key==='Enter')enlargeRebarDiagram(this)" class="rebar-diagram-card cursor-pointer rounded-lg bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 p-2 hover:ring-2 hover:ring-amber-400 transition" title="Click to enlarge">
-                    <p class="font-medium mb-1 text-center text-amber-800 dark:text-amber-300">Slab −ve bars</p>
-                    <svg viewBox="0 0 160 70" class="w-full h-20 sm:h-24" aria-hidden="true">
-                      <rect x="20" y="22" width="120" height="28" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
-                      <line x1="22" y1="30" x2="55" y2="30" stroke="#b45309" stroke-width="2"/>
-                      <line x1="22" y1="38" x2="55" y2="38" stroke="#b45309" stroke-width="2"/>
-                      <line x1="105" y1="30" x2="138" y2="30" stroke="#b45309" stroke-width="2"/>
-                      <line x1="105" y1="38" x2="138" y2="38" stroke="#b45309" stroke-width="2"/>
-                      <text x="24" y="16" fill="#b45309" font-size="8">short bars at supports</text>
-                      <text x="35" y="64" fill="#b45309" font-size="8">Bar length ≈ 0.3 × span</text>
+                  <!-- Two-way +ve -->
+                  <div role="button" tabindex="0" onclick="enlargeRebarDiagram(this)" onkeydown="if(event.key==='Enter')enlargeRebarDiagram(this)" class="rebar-diagram-card cursor-pointer rounded-lg bg-white dark:bg-slate-900 border border-sky-200 dark:border-sky-800 p-2 hover:ring-2 hover:ring-sky-400 transition" title="Click to enlarge">
+                    <p class="font-medium mb-1 text-center text-sky-800 dark:text-sky-300 text-[11px]">Two-way slab · +ve both ways</p>
+                    <svg viewBox="0 0 180 100" class="w-full h-24 sm:h-28" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="40" y="20" width="100" height="55" fill="#f0f9ff" stroke="#0284c7" stroke-width="1.5"/>
+                      <rect x="40" y="20" width="100" height="4" fill="#64748b"/>
+                      <rect x="40" y="71" width="100" height="4" fill="#64748b"/>
+                      <rect x="40" y="20" width="4" height="55" fill="#64748b"/>
+                      <rect x="136" y="20" width="4" height="55" fill="#64748b"/>
+                      <!-- short direction bars -->
+                      <line x1="55" y1="25" x2="55" y2="70" stroke="#0369a1" stroke-width="1.8"/>
+                      <line x1="75" y1="25" x2="75" y2="70" stroke="#0369a1" stroke-width="1.8"/>
+                      <line x1="95" y1="25" x2="95" y2="70" stroke="#0369a1" stroke-width="1.8"/>
+                      <line x1="115" y1="25" x2="115" y2="70" stroke="#0369a1" stroke-width="1.8"/>
+                      <!-- long direction bars -->
+                      <line x1="45" y1="32" x2="135" y2="32" stroke="#0ea5e9" stroke-width="1.5"/>
+                      <line x1="45" y1="45" x2="135" y2="45" stroke="#0ea5e9" stroke-width="1.5"/>
+                      <line x1="45" y1="58" x2="135" y2="58" stroke="#0ea5e9" stroke-width="1.5"/>
+                      <text x="48" y="14" fill="#0369a1" font-size="8" font-weight="bold">+ve short + +ve long</text>
+                      <text x="42" y="90" fill="#0369a1" font-size="7">Ratio L/B &lt; 2 → use two rows in table</text>
+                      <text x="42" y="98" fill="#64748b" font-size="7">(one row short dir · one row long dir)</text>
                     </svg>
-                    <p class="text-[10px] text-center text-slate-500 mt-0.5">Width · Span · Bar length shorter</p>
+                    <p class="text-[10px] text-center text-slate-500 mt-0.5">Main steel both directions</p>
+                  </div>
+                  <!-- -ve -->
+                  <div role="button" tabindex="0" onclick="enlargeRebarDiagram(this)" onkeydown="if(event.key==='Enter')enlargeRebarDiagram(this)" class="rebar-diagram-card cursor-pointer rounded-lg bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 p-2 hover:ring-2 hover:ring-amber-400 transition" title="Click to enlarge">
+                    <p class="font-medium mb-1 text-center text-amber-800 dark:text-amber-300 text-[11px]">−ve bars over supports</p>
+                    <svg viewBox="0 0 180 100" class="w-full h-24 sm:h-28" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="25" y="30" width="130" height="40" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+                      <!-- support beams -->
+                      <rect x="25" y="28" width="12" height="44" fill="#78716c"/>
+                      <rect x="85" y="28" width="12" height="44" fill="#78716c"/>
+                      <rect x="143" y="28" width="12" height="44" fill="#78716c"/>
+                      <!-- short -ve bars over each support -->
+                      <line x1="20" y1="40" x2="50" y2="40" stroke="#b45309" stroke-width="2.5"/>
+                      <line x1="20" y1="50" x2="50" y2="50" stroke="#b45309" stroke-width="2.5"/>
+                      <line x1="78" y1="40" x2="108" y2="40" stroke="#b45309" stroke-width="2.5"/>
+                      <line x1="78" y1="50" x2="108" y2="50" stroke="#b45309" stroke-width="2.5"/>
+                      <line x1="136" y1="40" x2="166" y2="40" stroke="#b45309" stroke-width="2.5"/>
+                      <line x1="136" y1="50" x2="166" y2="50" stroke="#b45309" stroke-width="2.5"/>
+                      <text x="40" y="20" fill="#b45309" font-size="8" font-weight="bold">−ve only near beams</text>
+                      <text x="30" y="88" fill="#b45309" font-size="8">Bar length ≈ 0.25–0.35 × span</text>
+                      <text x="30" y="98" fill="#64748b" font-size="7">(not full span · top steel)</text>
+                    </svg>
+                    <p class="text-[10px] text-center text-slate-500 mt-0.5">Shorter than span</p>
+                  </div>
+                  <!-- Distribution / one-way -->
+                  <div role="button" tabindex="0" onclick="enlargeRebarDiagram(this)" onkeydown="if(event.key==='Enter')enlargeRebarDiagram(this)" class="rebar-diagram-card cursor-pointer rounded-lg bg-white dark:bg-slate-900 border border-violet-200 dark:border-violet-800 p-2 hover:ring-2 hover:ring-violet-400 transition" title="Click to enlarge">
+                    <p class="font-medium mb-1 text-center text-violet-800 dark:text-violet-300 text-[11px]">One-way · distribution</p>
+                    <svg viewBox="0 0 180 100" class="w-full h-24 sm:h-28" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="30" y="18" width="130" height="55" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+                      <rect x="30" y="18" width="130" height="5" fill="#64748b"/>
+                      <rect x="30" y="68" width="130" height="5" fill="#64748b"/>
+                      <!-- distribution = along LONG direction (horizontal) -->
+                      <line x1="36" y1="30" x2="154" y2="30" stroke="#6d28d9" stroke-width="1.5"/>
+                      <line x1="36" y1="42" x2="154" y2="42" stroke="#6d28d9" stroke-width="1.5"/>
+                      <line x1="36" y1="54" x2="154" y2="54" stroke="#6d28d9" stroke-width="1.5"/>
+                      <text x="45" y="12" fill="#6d28d9" font-size="8" font-weight="bold">Distribution // long side</text>
+                      <text x="35" y="88" fill="#6d28d9" font-size="8">Bar length ≈ long span</text>
+                      <text x="35" y="98" fill="#64748b" font-size="7">Wider spacing than main · less steel</text>
+                    </svg>
+                    <p class="text-[10px] text-center text-slate-500 mt-0.5">Perpendicular to main</p>
                   </div>
                 </div>
-                <p class="text-[10px] text-slate-500 dark:text-slate-400">Same three columns for everything. For <strong>slab</strong> rows only: Count = panel width (m), Length = span (m), Bars = length of each bar (m). Spacing controls how many bars fit across the width.</p>
+                <p class="text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed"><strong>Table columns for slab:</strong> <em>Count</em> = length across which bars are spaced (m) · <em>Length</em> = span in the bar direction (m) · <em>Bars</em> = length of each bar (m). Spacing (mm) sets how many bars. Example one-way +ve: Count = long side, Length = short span, Bars ≈ short span. Two-way: add two +ve rows (short dir + long dir).</p>
               </div>
+
               
               Total scheduled rebar: <strong id="rebarScheduleTotal">0</strong> kg (<span id="rebarScheduleTonne">0</span> t) — includes <strong>main bars + stirrups/links</strong> (from Ø, spacing and member size). Ethiopian practice: often S-300 for ≤Ø12, S-400 for &gt;Ø12; S-500 for high-strength — adjust grade per row. Columns, beams, strap beams, pads and combined footings use closed stirrups; piles use spiral/rings.</p>
               <div class="grid sm:grid-cols-3 gap-2 mt-3 text-sm">
@@ -3023,15 +3069,15 @@
       const defaults = {
         column: { type:'column', label:'Column', nos:4, size:'300x300', len:3.0, mainBars:8, mainDia:16, grade:'S-400', distDia:8, spacing:150 },
         beam: { type:'beam', label:'Beam', nos:10, size:'200x400', len:4.5, mainBars:4, mainDia:16, grade:'S-400', distDia:8, spacing:150 },
-        slab: { type:'slab', label:'Slab +ve bars', nos:1, size:'150 thk', len:4.5, panelW:4.5, barLen:4.5, mainBars:0, mainDia:10, grade:'S-300', distDia:8, spacing:150 },
+        slab: { type:'slab', label:'Slab +ve (short span)', nos:1, size:'150 thk', len:4.0, panelW:8.0, barLen:4.0, mainBars:0, mainDia:10, grade:'S-300', distDia:8, spacing:150 },
         pad: { type:'pad', label:'Pad footing', nos:4, size:'1500x1500x400', len:1.5, mainBars:8, mainDia:12, grade:'S-300', distDia:10, spacing:150 },
         raft: { type:'raft', label:'Raft/mat', nos:1, size:'300 thk', len:100, mainBars:0, mainDia:12, grade:'S-400', distDia:12, spacing:150 },
         pile: { type:'pile', label:'Bored pile', nos:8, size:'Ø400', len:12, mainBars:6, mainDia:16, grade:'S-400', distDia:8, spacing:200 },
         combined: { type:'combined', label:'Combined footing', nos:2, size:'2000x4000x500', len:4, mainBars:12, mainDia:16, grade:'S-400', distDia:12, spacing:150 },
         strap: { type:'strap', label:'Strap beam', nos:4, size:'250x400', len:5.0, mainBars:4, mainDia:16, grade:'S-400', distDia:8, spacing:150 },
         shear: { type:'shear', label:'Shear wall / lift core', nos:1, size:'200 thk', len:40, mainBars:0, mainDia:12, grade:'S-400', distDia:10, spacing:150 },
-        slab_neg: { type:'slab', label:'Slab -ve bars', nos:1, size:'150 thk', len:4.5, panelW:2.2, barLen:1.35, mainBars:0, mainDia:12, grade:'S-400', distDia:8, spacing:150 },
-        slab_dist: { type:'slab', label:'Slab distribution', nos:1, size:'150 thk', len:4.5, panelW:4.5, barLen:4.5, mainBars:0, mainDia:8, grade:'S-300', distDia:8, spacing:200 }
+        slab_neg: { type:'slab', label:'Slab -ve (at supports)', nos:1, size:'150 thk', len:4.0, panelW:8.0, barLen:1.2, mainBars:0, mainDia:12, grade:'S-400', distDia:8, spacing:150 },
+        slab_dist: { type:'slab', label:'Slab distribution (long)', nos:1, size:'150 thk', len:8.0, panelW:4.0, barLen:8.0, mainBars:0, mainDia:8, grade:'S-300', distDia:8, spacing:250 }
       };
       const actB = (typeof projectBuildings !== 'undefined') ? projectBuildings.find(b => b.active) : null;
       const row = Object.assign({
