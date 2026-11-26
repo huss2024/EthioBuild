@@ -991,10 +991,10 @@
                   <thead class="bg-slate-100 dark:bg-gray-800">
                     <tr>
                       <th class="px-2 py-1.5 text-left">Member</th>
-                      <th class="px-2 py-1.5" title="Members count, or slab panel width m">Nos / W</th>
+                      <th class="px-2 py-1.5" title="Columns/beams: how many members. Slab: panel width in metres">Nos or Width</th>
                       <th class="px-2 py-1.5">Size (mm)</th>
-                      <th class="px-2 py-1.5" title="Span (slab) or member length (m)">Span/L (m)</th>
-                      <th class="px-2 py-1.5" title="Main bar count; for slab = each bar length m (Bar L)">Mains / Bar L</th>
+                      <th class="px-2 py-1.5" title="Columns/beams: member length. Slab: span in metres">Length or Span</th>
+                      <th class="px-2 py-1.5" title="Columns/beams: number of main bars. Slab: length of each bar in metres">Main bars or Bar length</th>
                       <th class="px-2 py-1.5">Ø main</th>
                       <th class="px-2 py-1.5">Main grade</th>
                       <th class="px-2 py-1.5">Stirrup grade</th>
@@ -1092,7 +1092,10 @@
                 <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-2">Mistaken add? Use <strong>✕</strong> on each row, <strong>Undo last slab helper</strong>, or <strong>Clear schedule</strong>. Edit numbers in the table anytime.</p>
               </div>
 
-              <p class="text-[11px] text-gray-500 mt-2"><p class="text-[10px] text-slate-500 dark:text-slate-400 mb-1">Slab rows: <strong>Nos/W</strong> = panel width (m), <strong>Span/L</strong> = span (m), <strong>Mains/Bar L</strong> = length of each bar (m). For -ve bars use shorter Bar L (e.g. ~0.3×span). Estimated bar count shows next to the label.</p>
+              <p class="text-[11px] text-gray-500 mt-2"><p class="text-[11px] text-slate-600 dark:text-slate-300 mb-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><strong>How to fill this table</strong><br>
+              • <strong>Column / beam / footing:</strong> Nos = how many members · Length = length of each (m) · Main bars = bars in the section<br>
+              • <strong>Slab +ve / −ve / distribution:</strong> Width = panel width (m) · Span = clear span (m) · Bar length = length of each bar (m)<br>
+              • <strong>Slab −ve bars</strong> are shorter than the span (often about 0.25–0.35 × span). +ve bars are usually near full span. Spacing sets how many bars fit across the width.</p>
               Total scheduled rebar: <strong id="rebarScheduleTotal">0</strong> kg (<span id="rebarScheduleTonne">0</span> t) — includes <strong>main bars + stirrups/links</strong> (from Ø, spacing and member size). Ethiopian practice: often S-300 for ≤Ø12, S-400 for &gt;Ø12; S-500 for high-strength — adjust grade per row. Columns, beams, strap beams, pads and combined footings use closed stirrups; piles use spiral/rings.</p>
               <div class="grid sm:grid-cols-3 gap-2 mt-3 text-sm">
                 <div>
@@ -3151,9 +3154,9 @@
         const nosField = isSlab ? 'panelW' : 'nos';
         const midVal = isSlab ? (r.barLen != null ? r.barLen : (r.len || 0)) : r.mainBars;
         const midField = isSlab ? 'barLen' : 'mainBars';
-        const midTitle = isSlab ? 'Each bar length (m) — -ve bars shorter than span' : 'Number of main bars';
-        const lenTitle = isSlab ? 'Slab span (m)' : (r.type==='raft' ? 'Area m²' : 'Member length m');
-        const nHint = isSlab && r._nBarsEst ? ` <span class="text-[9px] text-gray-400" title="Bars from width÷spacing">≈${r._nBarsEst} bars</span>` : '';
+        const midTitle = isSlab ? 'Slab: length of each bar in metres (−ve is shorter than span)' : 'Number of main bars in the section';
+        const lenTitle = isSlab ? 'Slab: span in metres' : (r.type==='raft' ? 'Area m²' : 'Length of member in metres');
+        const nHint = isSlab && r._nBarsEst ? ` <span class="text-[9px] text-gray-400" title="Number of bars ≈ width ÷ spacing">≈${r._nBarsEst} bars</span>` : '';
         return `<tr class="border-b border-slate-100 dark:border-gray-800">
           <td class="px-1 py-1"><span class="font-medium text-slate-800 dark:text-slate-100">${r.label||r.type}</span>${nHint} <button type="button" onclick="removeRebarRow('${r.id}')" class="text-red-500 dark:text-red-400 ml-1 font-bold" title="Remove this row">✕</button></td>
           <td class="px-1 py-1"><input type="number" step="0.1" data-rid="${r.id}" data-f="${nosField}" value="${nosVal}" class="w-14 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 text-xs text-right" title="${isSlab?'Panel / strip width (m)':'Number of members'}"></td>
