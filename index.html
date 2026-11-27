@@ -991,7 +991,7 @@
                   <thead class="bg-slate-100 dark:bg-gray-800">
                     <tr>
                       <th class="px-2 py-1.5 text-left">Member</th>
-                      <th class="px-2 py-1.5" title="How many members — or for slab: width of panel (m)">Count</th>
+                      <th class="px-2 py-1.5" title="How many members — or for slab: width of panel (m)">No.</th>
                       <th class="px-2 py-1.5">Size (mm)</th>
                       <th class="px-2 py-1.5" title="Member length (m) — or for slab: span (m)">Length (m)</th>
                       <th class="px-2 py-1.5" title="Number of main bars — or for slab: length of each bar (m)">Bars</th>
@@ -1009,9 +1009,6 @@
               <div class="flex flex-wrap gap-2 mt-2">
                 <button type="button" onclick="addRebarRow('column')" class="px-2.5 py-1.5 text-xs bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-lg border border-transparent dark:border-blue-700/50">+ Column</button>
                 <button type="button" onclick="addRebarRow('beam')" class="px-2.5 py-1.5 text-xs bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-lg border border-transparent dark:border-blue-700/50">+ Beam</button>
-                <button type="button" onclick="addRebarRow('slab')" class="px-2.5 py-1.5 text-xs bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-lg border border-transparent dark:border-blue-700/50">+ Slab +ve</button>
-                <button type="button" onclick="addRebarRow('slab_neg')" class="px-2.5 py-1.5 text-xs bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-lg border border-transparent dark:border-blue-700/50">+ Slab -ve</button>
-                <button type="button" onclick="addRebarRow('slab_dist')" class="px-2.5 py-1.5 text-xs bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-lg border border-transparent dark:border-blue-700/50">+ Slab dist.</button>
                 <button type="button" onclick="addRebarRow('pad')" class="px-2.5 py-1.5 text-xs bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-lg border border-transparent dark:border-blue-700/50">+ Pad footing</button>
                 <button type="button" onclick="addRebarRow('raft')" class="px-2.5 py-1.5 text-xs bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-lg border border-transparent dark:border-blue-700/50">+ Raft/mat</button>
                 <button type="button" onclick="addRebarRow('pile')" class="px-2.5 py-1.5 text-xs bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-lg border border-transparent dark:border-blue-700/50">+ Pile</button>
@@ -1023,7 +1020,105 @@
                 <button type="button" onclick="clearRebarSchedule()" class="px-2.5 py-1.5 text-xs bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-lg border border-red-200 dark:border-red-800">Clear schedule</button>
               </div>
 
+              
+              <!-- ===== SLAB PANELS (separate from columns/beams) ===== -->
+              <div id="slabPanelsSection" class="mt-4 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-950/20">
+                <h4 class="font-semibold text-sm text-emerald-900 dark:text-emerald-200 mb-1">Slab panels &amp; slab rebar</h4>
+                <p class="text-[11px] text-slate-600 dark:text-slate-300 mb-2">Separate from columns/beams. Add each panel with <strong>floor level</strong>, short &amp; long sides. App suggests +ve / −ve / distribution bars. Totals join the main rebar total.</p>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-6 gap-2 mb-2 text-xs">
+                  <div>
+                    <label class="block text-[10px] text-gray-500 mb-0.5">Floor level</label>
+                    <select id="spFloor" class="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-900">
+                      <option value="GF">Ground floor (GF)</option>
+                      <option value="Mezzanine">Mezzanine</option>
+                      <option value="1F">1st floor</option>
+                      <option value="2F">2nd floor</option>
+                      <option value="3F">3rd floor</option>
+                      <option value="4F">4th floor</option>
+                      <option value="5F">5th floor</option>
+                      <option value="Roof">Roof slab</option>
+                      <option value="Basement">Basement</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-gray-500 mb-0.5">Panel name</label>
+                    <input id="spName" type="text" placeholder="e.g. S1 / Living" class="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-900" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-gray-500 mb-0.5">Shape</label>
+                    <select id="spShape" onchange="if(typeof onSlabShapeChange==='function')onSlabShapeChange()" class="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-900">
+                      <option value="rect" selected>Rectangle</option>
+                      <option value="square">Square</option>
+                      <option value="circle">Circular</option>
+                      <option value="lshape">L-shape</option>
+                    </select>
+                  </div>
+                  <div id="spDimShortWrap">
+                    <label class="block text-[10px] text-gray-500 mb-0.5" id="spShortLabel">Short side (m)</label>
+                    <input id="spShort" type="number" step="0.1" min="0.5" value="4" class="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-900" />
+                  </div>
+                  <div id="spDimLongWrap">
+                    <label class="block text-[10px] text-gray-500 mb-0.5" id="spLongLabel">Long side (m)</label>
+                    <input id="spLong" type="number" step="0.1" min="0.5" value="6" class="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-900" />
+                  </div>
+                  <div id="spWingWrap" class="hidden">
+                    <label class="block text-[10px] text-gray-500 mb-0.5">L-wing width (m)</label>
+                    <input id="spWing" type="number" step="0.1" min="0.3" value="2" class="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-900" title="Second leg width for L-shape" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-gray-500 mb-0.5">Thickness (mm)</label>
+                    <input id="spThk" type="number" step="10" min="80" value="150" class="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-900" title="Slab thickness" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-gray-500 mb-0.5">Support type</label>
+                    <select id="spSupport" class="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-900">
+                      <option value="interior">Interior</option>
+                      <option value="edge">Edge</option>
+                      <option value="corner">Corner</option>
+                      <option value="cantilever">Cantilever</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-gray-500 mb-0.5">Opening L×W (m) optional</label>
+                    <div class="flex gap-1">
+                      <input id="spOpenL" type="number" step="0.1" min="0" placeholder="L" class="w-1/2 px-1 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-900" />
+                      <input id="spOpenW" type="number" step="0.1" min="0" placeholder="W" class="w-1/2 px-1 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-900" />
+                    </div>
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-2 mb-2">
+                  <button type="button" onclick="addSlabPanel()" class="px-3 py-1.5 text-xs bg-emerald-600 text-white rounded-lg font-medium">+ Add panel</button>
+                  <button type="button" onclick="suggestBarsActivePanel()" class="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg font-medium">Suggest bars for active panel</button>
+                  <button type="button" onclick="clearSlabPanels()" class="px-3 py-1.5 text-xs bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-lg border border-red-200">Clear panels</button>
+                </div>
+                <div id="slabPlanSvg" class="mb-2 p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 overflow-x-auto min-h-[80px] text-center text-xs text-gray-400">Add panels to see plan</div>
+                <div id="slabPanelsList" class="mb-2 space-y-1 text-xs"></div>
+                <p class="text-[10px] font-medium text-slate-600 dark:text-slate-300 mb-1">Slab rebar rows (editable)</p>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full text-xs">
+                    <thead class="bg-slate-100 dark:bg-slate-800">
+                      <tr>
+                        <th class="px-2 py-1 text-left">Floor</th>
+                        <th class="px-2 py-1 text-left">Panel</th>
+                        <th class="px-2 py-1 text-left">Type</th>
+                        <th class="px-2 py-1">Short (m)</th>
+                        <th class="px-2 py-1">Long (m)</th>
+                        <th class="px-2 py-1">Bar L (m)</th>
+                        <th class="px-2 py-1">Spacing</th>
+                        <th class="px-2 py-1">Ø</th>
+                        <th class="px-2 py-1">kg</th>
+                        <th class="px-2 py-1"></th>
+                      </tr>
+                    </thead>
+                    <tbody id="slabRebarBody"></tbody>
+                  </table>
+                </div>
+                <p class="text-[10px] text-slate-500 mt-1">Slab subtotal: <strong id="slabRebarKg">0</strong> kg — included in total scheduled rebar above.</p>
+              </div>
+
               <!-- Easy slab rebar helper -->
+
               <div class="mt-3 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/30">
                 <h4 class="text-xs font-semibold text-emerald-800 dark:text-emerald-200 mb-1">Slab rebar helper (easy)</h4>
                 <p class="text-[10px] text-gray-500 dark:text-gray-400 mb-2 leading-relaxed">
@@ -2883,6 +2978,298 @@
 
     // ===== REINFORCEMENT SCHEDULE =====
     let rebarSchedule = [];
+
+    // ===== SLAB PANELS (floor-aware, separate table) =====
+    let slabPanels = [];
+    let activeSlabPanelId = null;
+
+    
+    function onSlabShapeChange() {
+      const sh = document.getElementById('spShape')?.value || 'rect';
+      const shortL = document.getElementById('spShortLabel');
+      const longL = document.getElementById('spLongLabel');
+      const wing = document.getElementById('spWingWrap');
+      const longW = document.getElementById('spDimLongWrap');
+      if (wing) wing.classList.toggle('hidden', sh !== 'lshape');
+      if (longW) longW.classList.toggle('hidden', sh === 'circle' || sh === 'square');
+      if (shortL) {
+        if (sh === 'circle') shortL.textContent = 'Diameter (m)';
+        else if (sh === 'square') shortL.textContent = 'Side (m)';
+        else shortL.textContent = 'Short side (m)';
+      }
+      if (longL) longL.textContent = sh === 'lshape' ? 'Long overall (m)' : 'Long side (m)';
+    }
+
+
+    function addSlabPanel() {
+      const floor = document.getElementById('spFloor')?.value || 'GF';
+      let name = (document.getElementById('spName')?.value || '').trim();
+      const shape = document.getElementById('spShape')?.value || 'rect';
+      let shortS = parseFloat(document.getElementById('spShort')?.value) || 4;
+      let longS = parseFloat(document.getElementById('spLong')?.value) || 6;
+      const wing = parseFloat(document.getElementById('spWing')?.value) || 2;
+      const thk = parseFloat(document.getElementById('spThk')?.value) || 150;
+      const support = document.getElementById('spSupport')?.value || 'interior';
+      const openL = parseFloat(document.getElementById('spOpenL')?.value) || 0;
+      const openW = parseFloat(document.getElementById('spOpenW')?.value) || 0;
+      if (!name) name = 'P' + (slabPanels.length + 1);
+      if (shape === 'circle') { longS = shortS; }
+      if (shape === 'square') { longS = shortS; }
+      const L = Math.max(shortS, longS);
+      const B = Math.min(shortS, longS);
+      // Effective area for openings / steel scaling
+      let area = L * B;
+      if (shape === 'circle') area = Math.PI * (shortS / 2) * (shortS / 2);
+      else if (shape === 'lshape') {
+        // overall L x B rectangle minus missing corner (approx wing)
+        const w = Math.min(wing, B);
+        area = L * B - (L - w) * (B - w) * 0.5; // soft approx
+        area = L * w + (B - w) * w; // standard L: stem + flange
+        if (area <= 0) area = L * B * 0.75;
+      }
+      const ratio = B > 0 ? L / B : 2;
+      const oneway = shape === 'circle' ? false : (ratio >= 2);
+      const id = newRebarId();
+      const panel = {
+        id, floor, name, shape,
+        short: B, long: L, wing: wing,
+        area: Math.round(area * 100) / 100,
+        thk: thk,
+        support, openL, openW,
+        oneway,
+        active: true
+      };
+      slabPanels.forEach(p => p.active = false);
+      slabPanels.push(panel);
+      activeSlabPanelId = id;
+      if (document.getElementById('spName')) document.getElementById('spName').value = '';
+      renderSlabPanelsUI();
+      if (typeof showToast === 'function') {
+        showToast(name + ' @ ' + floor + ' — ' + B + '×' + L + ' m × ' + thk + ' mm — ' + (oneway ? 'one-way' : 'two-way'));
+      }
+    }
+
+    function setActiveSlabPanel(id) {
+      activeSlabPanelId = String(id);
+      slabPanels.forEach(p => p.active = String(p.id) === String(id));
+      renderSlabPanelsUI();
+    }
+
+    function removeSlabPanel(id) {
+      // remove panel and its suggested slab rows
+      const pid = String(id);
+      slabPanels = slabPanels.filter(p => String(p.id) !== pid);
+      rebarSchedule = rebarSchedule.filter(r => !(r.type === 'slab' && String(r.panelId) === pid));
+      if (activeSlabPanelId === pid) activeSlabPanelId = slabPanels[0]?.id || null;
+      renderSlabPanelsUI();
+      renderRebarSchedule();
+    }
+
+    function clearSlabPanels() {
+      if (slabPanels.length && !confirm('Remove all slab panels and their slab bar rows?')) return;
+      const ids = new Set(slabPanels.map(p => String(p.id)));
+      slabPanels = [];
+      activeSlabPanelId = null;
+      rebarSchedule = rebarSchedule.filter(r => !(r.type === 'slab' && r.panelId && ids.has(String(r.panelId))));
+      // also clear untagged slab rows from suggestions
+      renderSlabPanelsUI();
+      renderRebarSchedule();
+    }
+
+    function renderSlabPanelsUI() {
+      const list = document.getElementById('slabPanelsList');
+      const svgHost = document.getElementById('slabPlanSvg');
+      if (list) {
+        if (!slabPanels.length) {
+          list.innerHTML = '<p class="text-gray-400">No panels yet.</p>';
+        } else {
+          list.innerHTML = slabPanels.map(p => {
+            const ratio = p.short > 0 ? (p.long / p.short).toFixed(2) : '—';
+            const act = p.active ? 'ring-2 ring-emerald-500' : '';
+            return `<div class="flex flex-wrap items-center gap-2 p-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 ${act}">
+              <button type="button" onclick="setActiveSlabPanel('${p.id}')" class="font-medium text-emerald-700 dark:text-emerald-300">${p.floor} · ${p.name}</button>
+              <span class="text-slate-500">${p.shape||'rect'} · ${p.short}×${p.long} m · ${p.thk||150} mm · area ~${p.area!=null?p.area:(p.short*p.long).toFixed(1)} m² · ${p.oneway ? 'one-way' : 'two-way'} · ${p.support}</span>
+              ${(p.openL > 0 && p.openW > 0) ? `<span class="text-amber-600">opening ${p.openL}×${p.openW}</span>` : ''}
+              <button type="button" onclick="removeSlabPanel('${p.id}')" class="text-red-500 font-bold ml-auto">✕</button>
+            </div>`;
+          }).join('');
+        }
+      }
+      if (svgHost) {
+        if (!slabPanels.length) {
+          svgHost.innerHTML = '<span class="text-gray-400">Add panels to see plan</span>';
+        } else {
+          // Plan scales to submitted sizes (metres → SVG). Group by floor.
+          const pad = 16;
+          const scale = 28; // px per metre (auto-fit below)
+          const floors = [];
+          slabPanels.forEach(p => {
+            if (!floors.includes(p.floor)) floors.push(p.floor);
+          });
+          let maxW = 0, totalH = pad;
+          const rows = floors.map(fl => {
+            const panels = slabPanels.filter(p => p.floor === fl);
+            let x = pad, rowH = 0;
+            const items = panels.map(p => {
+              const w = Math.max(36, p.long * scale);
+              const h = Math.max(28, p.short * scale);
+              rowH = Math.max(rowH, h);
+              const item = { p, x, w, h };
+              x += w + 12;
+              return item;
+            });
+            maxW = Math.max(maxW, x + pad);
+            const y0 = totalH + 14;
+            totalH = y0 + rowH + 28;
+            return { fl, items, y0, rowH };
+          });
+          // Fit width if many panels
+          let fit = 1;
+          if (maxW > 520) fit = 520 / maxW;
+          const W = Math.max(200, maxW * fit);
+          const H = Math.max(90, totalH * fit + 8);
+          let parts = `<text x="${pad}" y="12" font-size="10" fill="#64748b">Plan (scales with short × long · click to select)</text>`;
+          rows.forEach(row => {
+            const yLabel = row.y0 * fit - 2;
+            parts += `<text x="${pad * fit}" y="${yLabel}" font-size="9" fill="#059669" font-weight="600">${row.fl}</text>`;
+            row.items.forEach(({ p, x, w, h }) => {
+              const xx = x * fit, yy = row.y0 * fit, ww = w * fit, hh = h * fit;
+              const fill = p.active ? '#a7f3d0' : '#e2e8f0';
+              const stroke = p.active ? '#059669' : '#64748b';
+              const sh = p.shape || 'rect';
+              parts += `<g onclick="setActiveSlabPanel('${p.id}')" style="cursor:pointer">`;
+              if (sh === 'circle') {
+                const rr = Math.min(ww, hh) / 2;
+                const cx = xx + ww/2, cy = yy + hh/2;
+                parts += `<circle cx="${cx}" cy="${cy}" r="${rr}" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
+              } else if (sh === 'lshape') {
+                const t = Math.max(ww * 0.35, 12);
+                const u = Math.max(hh * 0.35, 12);
+                parts += `<path d="M${xx} ${yy} H${xx+ww} V${yy+u} H${xx+t} V${yy+hh} H${xx} Z" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
+              } else {
+                parts += `<rect x="${xx}" y="${yy}" width="${ww}" height="${hh}" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
+              }
+              parts += `
+                <text x="${xx + ww/2}" y="${yy + hh/2 - 6}" text-anchor="middle" font-size="${Math.min(11, Math.max(7, ww/8))}" fill="#0f172a" font-weight="600">${p.name}</text>
+                <text x="${xx + ww/2}" y="${yy + hh/2 + 6}" text-anchor="middle" font-size="8" fill="#334155">${sh==='circle' ? ('Ø '+p.short+' m') : (p.short+'×'+p.long+' m')}</text>
+                <text x="${xx + ww/2}" y="${yy + hh/2 + 16}" text-anchor="middle" font-size="7" fill="#64748b">${p.thk||150} mm</text>`;
+              if (p.openL > 0 && p.openW > 0) {
+                const ow = Math.max(8, (p.openL / p.long) * ww);
+                const oh = Math.max(8, (p.openW / p.short) * hh);
+                parts += `<rect x="${xx + ww/2 - ow/2}" y="${yy + hh/2 - oh/2}" width="${ow}" height="${oh}" fill="#fff7ed" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4 2"/>`;
+              }
+              // dimension ticks
+              parts += `<text x="${xx + ww/2}" y="${yy + hh + 10}" text-anchor="middle" font-size="7" fill="#94a3b8">L=${p.long}</text>`;
+              parts += `</g>`;
+            });
+          });
+          svgHost.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="w-full max-w-full" style="min-height:100px;height:auto">${parts}</svg>`;
+        }
+      }
+      renderSlabRebarTable();
+    }
+
+    function suggestBarsActivePanel() {
+      const p = slabPanels.find(x => x.active) || slabPanels.find(x => String(x.id) === String(activeSlabPanelId));
+      if (!p) {
+        if (typeof showToast === 'function') showToast('Add and select a slab panel first');
+        return;
+      }
+      // Remove previous suggestions for this panel
+      rebarSchedule = rebarSchedule.filter(r => !(r.type === 'slab' && String(r.panelId) === String(p.id)));
+      const B = p.short, L = p.long;
+      const openA = (p.openL > 0 && p.openW > 0) ? p.openL * p.openW : 0;
+      const baseA = (p.area != null && p.area > 0) ? p.area : (L * B);
+      const area = Math.max(0.1, baseA - openA);
+      const scale = baseA > 0 ? area / baseA : 1;
+      // Circle: treat as two-way, span ≈ diameter
+      if (p.shape === 'circle') {
+        // already oneway=false; B and L are diameter
+      }
+
+      const push = (label, panelW, span, barLen, dia, spacing, grade) => {
+        rebarSchedule.push({
+          id: newRebarId(),
+          type: 'slab',
+          label,
+          panelId: p.id,
+          floor: p.floor,
+          panelName: p.name,
+          nos: 1,
+          size: (p.thk || 150) + ' mm thk',
+          len: span,
+          panelW: Math.round(panelW * scale * 100) / 100,
+          barLen: Math.round(barLen * 100) / 100,
+          mainBars: 0,
+          mainDia: dia,
+          grade: grade || 'S-300',
+          distDia: 8,
+          spacing
+        });
+      };
+
+      if (p.support === 'cantilever') {
+        // top steel along cantilever = short direction typically
+        push(p.floor + ' ' + p.name + ' cantilever top', L, B, B + 0.5, 12, 150, 'S-400');
+        push(p.floor + ' ' + p.name + ' cantilever dist.', B, L, L, 8, 200, 'S-300');
+      } else if (p.oneway) {
+        // main +ve along SHORT span; count across LONG side
+        push(p.floor + ' ' + p.name + ' +ve (short)', L, B, B, 10, 150, 'S-300');
+        // distribution along long
+        push(p.floor + ' ' + p.name + ' dist. (long)', B, L, L, 8, 250, 'S-300');
+        // -ve at supports (both ends of short span)
+        const negLen = Math.max(0.5, Math.round(B * 0.3 * 100) / 100);
+        push(p.floor + ' ' + p.name + ' −ve supports', L, B, negLen, 12, 150, 'S-400');
+      } else {
+        // two-way: +ve both directions
+        push(p.floor + ' ' + p.name + ' +ve short', L, B, B, 10, 150, 'S-300');
+        push(p.floor + ' ' + p.name + ' +ve long', B, L, L, 10, 150, 'S-300');
+        const negB = Math.max(0.5, Math.round(B * 0.3 * 100) / 100);
+        const negL = Math.max(0.5, Math.round(L * 0.3 * 100) / 100);
+        push(p.floor + ' ' + p.name + ' −ve short', L, B, negB, 12, 150, 'S-400');
+        push(p.floor + ' ' + p.name + ' −ve long', B, L, negL, 12, 150, 'S-400');
+      }
+      renderRebarSchedule();
+      renderSlabRebarTable();
+      if (typeof showToast === 'function') showToast('Bars suggested for ' + p.floor + ' · ' + p.name + ' — edit Ø/spacing as needed');
+    }
+
+    function renderSlabRebarTable() {
+      const body = document.getElementById('slabRebarBody');
+      if (!body) return;
+      const rows = rebarSchedule.filter(r => r.type === 'slab');
+      if (!rows.length) {
+        body.innerHTML = '<tr><td colspan="10" class="px-2 py-2 text-gray-400 text-center">No slab bars — add a panel, then “Suggest bars”</td></tr>';
+        const sk = document.getElementById('slabRebarKg');
+        if (sk) sk.textContent = '0';
+        return;
+      }
+      let tot = 0;
+      body.innerHTML = rows.map(r => {
+        const kg = estimateRowKg(r);
+        tot += kg;
+        return `<tr class="border-b border-slate-100 dark:border-gray-800">
+          <td class="px-1 py-1">${r.floor || '—'}</td>
+          <td class="px-1 py-1">${r.panelName || '—'}</td>
+          <td class="px-1 py-1">${r.label || ''}</td>
+          <td class="px-1 py-1"><input type="number" step="0.1" data-rid="${r.id}" data-f="panelW" value="${r.panelW != null ? r.panelW : ''}" class="w-14 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-xs text-right"></td>
+          <td class="px-1 py-1"><input type="number" step="0.1" data-rid="${r.id}" data-f="len" value="${r.len}" class="w-14 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-xs text-right"></td>
+          <td class="px-1 py-1"><input type="number" step="0.05" data-rid="${r.id}" data-f="barLen" value="${r.barLen != null ? r.barLen : r.len}" class="w-14 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-xs text-right"></td>
+          <td class="px-1 py-1"><input type="number" data-rid="${r.id}" data-f="spacing" value="${r.spacing}" class="w-14 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-xs text-right"></td>
+          <td class="px-1 py-1"><input type="number" data-rid="${r.id}" data-f="mainDia" value="${r.mainDia}" class="w-12 px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-900 text-xs text-right"></td>
+          <td class="px-1 py-1 text-right">${Math.round(kg)}</td>
+          <td class="px-1 py-1"><button type="button" onclick="removeRebarRow('${r.id}')" class="text-red-500 font-bold">✕</button></td>
+        </tr>`;
+      }).join('');
+      const sk = document.getElementById('slabRebarKg');
+      if (sk) sk.textContent = Math.round(tot).toLocaleString();
+      body.querySelectorAll('[data-rid]').forEach(el => {
+        el.addEventListener('input', onRebarField);
+        el.addEventListener('change', onRebarField);
+        el.addEventListener('blur', onRebarFieldBlur);
+      });
+    }
+
     const BAR_AREA = { 8:50.3, 10:78.5, 12:113.1, 14:153.9, 16:201.1, 20:314.2, 25:490.9 }; // mm2
     function defaultGradeForDia(dia) {
       const mode = document.getElementById('specRebarGrade')?.value || 'auto';
@@ -3234,12 +3621,19 @@
       const tbody = document.getElementById('rebarScheduleBody');
       if (!tbody) return;
       if (!rebarSchedule.length) {
-        tbody.innerHTML = '<tr><td colspan="10" class="px-2 py-3 text-gray-400 text-center">No members yet — add Column, Beam, Slab, Pad, Raft or Pile</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="px-2 py-3 text-gray-400 text-center">No members yet — add Column, Beam, Pad, Raft or Pile (slab bars: use Slab panels below)</td></tr>';
         document.getElementById('rebarScheduleTotal').textContent = '0';
         document.getElementById('rebarScheduleTonne').textContent = '0';
+        if (typeof renderSlabRebarTable === 'function') renderSlabRebarTable();
         return;
       }
-      tbody.innerHTML = rebarSchedule.map(r => {
+      const structRows = rebarSchedule.filter(r => r.type !== 'slab');
+      if (!structRows.length && rebarSchedule.some(r => r.type === 'slab')) {
+        tbody.innerHTML = '<tr><td colspan="10" class="px-2 py-2 text-gray-400 text-center text-xs">No columns/beams/footings yet — slab bars are in the Slab panels table below</td></tr>';
+      } else if (!structRows.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="px-2 py-3 text-gray-400 text-center">No members yet — add Column, Beam, Pad, Raft or Pile</td></tr>';
+      } else {
+      tbody.innerHTML = structRows.map(r => {
         const kg = estimateRowKg(r);
         const isSlab = r.type === 'slab';
         const nosVal = isSlab ? (r.panelW != null ? r.panelW : r.nos) : r.nos;
@@ -3263,6 +3657,7 @@
           <td class="px-1 py-1 text-right font-medium tabular-nums" data-kg-cell="1">${kg.toLocaleString()}</td>
         </tr>`;
       }).join('');
+      } // end structRows
       tbody.querySelectorAll('[data-rid]').forEach(el => {
         // input: type freely without losing focus; change: selects / commit
         el.addEventListener('input', onRebarField);
@@ -3272,6 +3667,7 @@
       const total = rebarSchedule.reduce((s,r) => s + estimateRowKg(r), 0);
       document.getElementById('rebarScheduleTotal').textContent = total.toLocaleString();
       document.getElementById('rebarScheduleTonne').textContent = (total/1000).toFixed(2);
+      if (typeof renderSlabRebarTable === 'function') renderSlabRebarTable();
     }
     function onRebarField(e) {
       // Update model only — do NOT rebuild the table on every keystroke (keeps focus while typing size/numbers)
@@ -3332,6 +3728,7 @@
     function onRebarFieldBlur(e) {
       // Finalize numbers and refresh totals after user leaves the field
       onRebarField(e);
+      if (typeof renderRebarSchedule === 'function') renderRebarSchedule();
     }
     function getRebarKgByGrade() {
       const by = {};
