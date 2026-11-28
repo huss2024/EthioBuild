@@ -197,6 +197,19 @@
     details.setup-card > summary::-webkit-details-marker { display: none; }
     details.setup-card:not([open]) > summary .text-blue-600 { display: inline-block; transform: rotate(-90deg); }
 
+  
+    /* Clearer default text */
+    body { font-size: 15px; }
+    label, .text-xs { font-size: 0.8125rem !important; }
+    .text-\[10px\], .text-\[11px\] { font-size: 0.75rem !important; }
+    input, select, button, textarea { font-size: 0.9rem; }
+    #appZoomRoot { transform-origin: top center; transition: transform 0.15s ease; }
+    .zoom-bar { position: fixed; bottom: 1rem; right: 1rem; z-index: 99990; display: flex; gap: 0.25rem; align-items: center;
+      background: rgba(15,23,42,0.92); color: #fff; padding: 0.35rem 0.5rem; border-radius: 999px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); font-size: 13px; }
+    .zoom-bar button { width: 2rem; height: 2rem; border-radius: 999px; background: #334155; color: #fff; font-weight: 700; border: none; cursor: pointer; }
+    .zoom-bar button:hover { background: #475569; }
+    .zoom-bar span { min-width: 3rem; text-align: center; }
+
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen">
@@ -1119,8 +1132,14 @@
 
               <!-- Easy slab rebar helper -->
 
-              <div class="mt-3 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/30">
-                <h4 class="text-xs font-semibold text-emerald-800 dark:text-emerald-200 mb-1">Slab rebar helper (easy)</h4>
+              <details class="mt-3 section-collapse rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/30">
+              <summary class="cursor-pointer list-none px-3 py-2 flex items-center gap-2">
+                <span class="text-emerald-700 dark:text-emerald-300 text-xs collapse-arrow">▼</span>
+                <span class="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Slab rebar helper (easy)</span>
+                <span class="text-xs font-normal text-gray-500">— optional</span>
+              </summary>
+              <div class="px-3 pb-3">
+                <h4 class="hidden">Slab rebar helper (easy)</h4>
                 <p class="text-[10px] text-gray-500 dark:text-gray-400 mb-2 leading-relaxed">
                   Enter the slab panel short &amp; long sides and how edges are supported. The app estimates
                   <strong>+ve (midspan)</strong>, <strong>−ve (over supports)</strong> and <strong>distribution</strong> bars — then adds them to the schedule.
@@ -1186,8 +1205,15 @@
                 </div>
                 <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-2">Mistaken add? Use <strong>✕</strong> on each row, <strong>Undo last slab helper</strong>, or <strong>Clear schedule</strong>. Edit numbers in the table anytime.</p>
               </div>
+              </details>
 
-              <p class="text-[11px] text-gray-500 mt-2"><div class="mb-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-[11px] text-slate-700 dark:text-slate-200">
+              <details class="mb-3 section-collapse rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+              <summary class="cursor-pointer list-none px-3 py-2 font-semibold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <span class="text-blue-600 text-xs collapse-arrow">▼</span> Slab steel layout guide (optional)
+                <span class="font-normal text-xs text-slate-500">— pictures &amp; one-way / two-way help</span>
+              </summary>
+              <div class="px-3 pb-3">
+              <div class="mb-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-[11px] text-slate-700 dark:text-slate-200">
                 <p class="font-semibold text-slate-800 dark:text-slate-100 mb-1">Slab steel — correct layout <span class="font-normal text-slate-500">(click a picture to enlarge)</span></p>
                 <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-2">One-way slab: long/short ≥ 2 → main +ve along the <strong>short</strong> span. Two-way: ratio &lt; 2 → main +ve in <strong>both</strong> directions. −ve bars sit over supports and are shorter.</p>
                 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 mb-2">
@@ -1281,6 +1307,8 @@
                 </div>
                 <p class="text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed"><strong>Table columns for slab:</strong> <em>Count</em> = length across which bars are spaced (m) · <em>Length</em> = span in the bar direction (m) · <em>Bars</em> = length of each bar (m). Spacing (mm) sets how many bars. Example one-way +ve: Count = long side, Length = short span, Bars ≈ short span. Two-way: add two +ve rows (short dir + long dir).</p>
               </div>
+              </div>
+            </details>
 
               
               Total scheduled rebar: <strong id="rebarScheduleTotal">0</strong> kg (<span id="rebarScheduleTonne">0</span> t) — includes <strong>main bars + stirrups/links</strong> (from Ø, spacing and member size). Ethiopian practice: often S-300 for ≤Ø12, S-400 for &gt;Ø12; S-500 for high-strength — adjust grade per row. Columns, beams, strap beams, pads and combined footings use closed stirrups; piles use spiral/rings.</p>
@@ -4476,6 +4504,26 @@
     }
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeRebarDiagram();
+    });
+
+    
+    let ebZoomLevel = 1;
+    function ebApplyZoom() {
+      document.documentElement.style.fontSize = (15 * ebZoomLevel) + 'px';
+      const lab = document.getElementById('zoomLabel');
+      if (lab) lab.textContent = Math.round(ebZoomLevel * 100) + '%';
+      try { localStorage.setItem('ebZoom', String(ebZoomLevel)); } catch(e) {}
+    }
+    function ebZoom(delta) {
+      if (delta === 0) ebZoomLevel = 1;
+      else ebZoomLevel = Math.min(1.45, Math.max(0.8, Math.round((ebZoomLevel + delta) * 20) / 20));
+      ebApplyZoom();
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        const z = parseFloat(localStorage.getItem('ebZoom'));
+        if (z && z >= 0.8 && z <= 1.45) { ebZoomLevel = z; ebApplyZoom(); }
+      } catch(e) {}
     });
 
     function forceSetupCardsCollapsed() {
@@ -7763,6 +7811,14 @@
       <div id="rebarDiagramModalBody" class="w-full flex justify-center items-center min-h-[200px]"></div>
       <p class="text-xs text-center text-gray-500 mt-3">Tap outside or × to close</p>
     </div>
+  </div>
+
+
+  <div id="zoomBar" class="zoom-bar no-print" title="Page zoom">
+    <button type="button" onclick="ebZoom(-0.1)" aria-label="Zoom out">−</button>
+    <span id="zoomLabel">100%</span>
+    <button type="button" onclick="ebZoom(0.1)" aria-label="Zoom in">+</button>
+    <button type="button" onclick="ebZoom(0)" title="Reset" style="width:auto;padding:0 0.5rem;font-size:11px;">Reset</button>
   </div>
 
 </body>
