@@ -1407,14 +1407,16 @@
               </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5">
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-4 max-w-xl">
               <h3 class="font-semibold mb-1 text-sm">Quick Actions</h3>
-              <p class="text-xs text-gray-500 mb-3">Recommended order for new projects</p>
-              <button onclick="autoEstimateFromGFA()" class="w-full py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-medium text-sm mb-2">1. Auto-fill Takeoff from GFA</button>
-              <button onclick="generateFromTakeoff()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium text-sm mb-2">2. Generate BOQ from Takeoff</button>
-              <button type="button" onclick="undoLastBoqGenerate()" class="w-full py-2 bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-700 rounded-xl font-medium text-sm mb-2">Undo last Generate BOQ</button>
-              <p class="text-[10px] text-gray-500 mb-2">If you click Generate by mistake, use <strong>Undo last Generate BOQ</strong> to restore the previous bill.</p>
-              <button onclick="document.querySelector('[data-tab=summary]').click()" class="w-full py-2.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-xl font-medium text-sm">3. View Summary & Charts</button>
+              <p class="text-xs text-gray-500 mb-2">Recommended order for new projects</p>
+              <div class="flex flex-col gap-1.5 max-w-sm">
+                <button onclick="autoEstimateFromGFA()" class="w-full py-2 px-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-medium text-sm text-left">1. Auto-fill Takeoff from GFA</button>
+                <button onclick="generateFromTakeoff()" class="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium text-sm text-left">2. Generate BOQ from Takeoff</button>
+                <button type="button" onclick="undoLastBoqGenerate()" class="w-full py-2 px-3 bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-700 rounded-xl font-medium text-sm text-left">Undo last Generate BOQ</button>
+                <p class="text-[10px] text-gray-500">If you click Generate by mistake, use Undo to restore the previous bill.</p>
+                <button onclick="document.querySelector('[data-tab=summary]').click()" class="w-full py-2 px-3 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-xl font-medium text-sm text-left">3. View Summary & Charts</button>
+              </div>
             </div>
           </div>
         </div>
